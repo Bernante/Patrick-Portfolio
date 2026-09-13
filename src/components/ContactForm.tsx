@@ -9,7 +9,6 @@ const SERVICES = [
   "GoHighLevel Build",
   "Web Development",
   "Video Editing",
-  "Systems & Integration",
   "Not sure yet",
 ];
 

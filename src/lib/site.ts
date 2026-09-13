@@ -70,7 +70,7 @@ export const pages = {
   services: {
     title: "Services",
     description:
-      "AI automation, GoHighLevel builds, web development, video editing and systems integration for coaches, agencies and small teams.",
+      "AI automation, GoHighLevel builds, web development and video editing for coaches, agencies and small teams.",
   },
   about: {
     title: "About",
@@ -192,14 +192,6 @@ export const services = [
     summary:
       "Short-form and long-form edits with clean pacing, captions and motion that hold attention.",
     points: ["Reels, Shorts & TikTok", "YouTube long-form", "Captions & motion graphics"],
-  },
-  {
-    num: "05",
-    title: "Systems & Integration",
-    icon: "plugs",
-    summary:
-      "Connecting the tools you already pay for so data moves on its own instead of through copy-paste.",
-    points: ["API & webhook wiring", "n8n / Make scenarios", "Reporting dashboards"],
   },
 ] as const;
 
