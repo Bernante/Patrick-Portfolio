@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/lib/site";
 
+// Static export (GitHub Pages): generate this image once at build time.
+export const dynamic = "force-static";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = `${site.name} — ${site.role}`;

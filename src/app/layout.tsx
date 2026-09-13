@@ -5,7 +5,7 @@ import { MobileTabBar } from "@/components/MobileTabBar";
 import { ParticlesBackdrop } from "@/components/ParticlesBackdrop";
 import { Sidebar } from "@/components/Sidebar";
 import { CustomCursor } from "@/components/ui/custom-cursor";
-import { pages, site } from "@/lib/site";
+import { asset, pages, site } from "@/lib/site";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   },
   description: pages.home.description,
   applicationName: `${site.name} Portfolio`,
+  // A plain file, not an icon.tsx route: Next leaves the GitHub Pages
+  // sub-folder off the auto-generated icon link, so the favicon would break.
+  icons: { icon: [{ url: asset("/icon.png"), type: "image/png", sizes: "512x512" }] },
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
   publisher: site.name,

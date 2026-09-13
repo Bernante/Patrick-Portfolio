@@ -1,4 +1,4 @@
-import { site } from "@/lib/site";
+import { asset, site } from "@/lib/site";
 import { Icon, type IconName } from "../Icon";
 import { Reveal } from "../Reveal";
 import { SectionHeading } from "../SectionHeading";
@@ -36,7 +36,7 @@ const values = [
  * About card), used at the owner's request; replace it with your own artwork if
  * its licence is unclear. Real pixel size, so it is never distorted.
  */
-const ILLUSTRATION = { src: "/about/about-illustration.webp", width: 1100, height: 815 };
+const ILLUSTRATION = { src: asset("/about/about-illustration.webp"), width: 1100, height: 815 };
 
 /**
  * About page, laid out like the reference About page:

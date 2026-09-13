@@ -3,6 +3,16 @@
  * Edit this file to update the portfolio — components read from here.
  */
 
+import { basePath } from "./base-path";
+
+/**
+ * Prefixes a public/ file path with the GitHub Pages sub-folder (see
+ * base-path.ts). next/link adds it to links automatically, but plain <img>
+ * paths do not, so every file from public/ goes through `asset()`.
+ */
+export { basePath };
+export const asset = (path: string) => `${basePath}${path}`;
+
 export const site = {
   name: "Patrick Bernante",
   firstName: "Patrick",
@@ -14,8 +24,8 @@ export const site = {
   heroDescription: "I help coaches and agencies turn every lead into a booked call, on autopilot.",
   intro:
     "I build AI automations, fast websites and scroll-stopping video for coaches, agencies and small teams — so the work keeps running after you log off.",
-  // Update this to your real domain before deploying.
-  url: "https://patrickbernante.com",
+  // The live address (GitHub Pages). Change this if you move to your own domain.
+  url: "https://bernante.github.io/-PatrickBernante-Portfolio",
   locale: "en_PH",
   email: "hello@patrickbernante.com",
   phone: "+63 900 000 0000",
@@ -89,16 +99,16 @@ export const pages = {
  * letterform tiles. `icon` is the Phosphor fallback used if a logo is missing.
  */
 export const tools = [
-  { name: "GoHighLevel", icon: "funnel", logo: "/logos/gohighlevel.png" },
-  { name: "Claude", icon: "sparkle", logo: "/logos/claude.svg" },
-  { name: "VS Code", icon: "code", logo: "/logos/vscode.png" },
-  { name: "n8n", icon: "flow", logo: "/logos/n8n.svg" },
-  { name: "Make", icon: "puzzle", logo: "/logos/make.svg" },
-  { name: "Next.js", icon: "browser", logo: "/logos/nextjs.svg" },
-  { name: "Premiere Pro", icon: "film", logo: "/logos/premiere-pro.svg" },
-  { name: "After Effects", icon: "wand", logo: "/logos/after-effects.svg" },
-  { name: "Figma", icon: "pen", logo: "/logos/figma.svg" },
-  { name: "ChatGPT", icon: "robot", logo: "/logos/chatgpt.webp" },
+  { name: "GoHighLevel", icon: "funnel", logo: asset("/logos/gohighlevel.png") },
+  { name: "Claude", icon: "sparkle", logo: asset("/logos/claude.svg") },
+  { name: "VS Code", icon: "code", logo: asset("/logos/vscode.png") },
+  { name: "n8n", icon: "flow", logo: asset("/logos/n8n.svg") },
+  { name: "Make", icon: "puzzle", logo: asset("/logos/make.svg") },
+  { name: "Next.js", icon: "browser", logo: asset("/logos/nextjs.svg") },
+  { name: "Premiere Pro", icon: "film", logo: asset("/logos/premiere-pro.svg") },
+  { name: "After Effects", icon: "wand", logo: asset("/logos/after-effects.svg") },
+  { name: "Figma", icon: "pen", logo: asset("/logos/figma.svg") },
+  { name: "ChatGPT", icon: "robot", logo: asset("/logos/chatgpt.webp") },
 ] as const;
 
 /**
@@ -114,8 +124,8 @@ export const testimonials: { quote: string; name: string; role: string }[] = [];
  * `height` are the image's real pixel size, so it is never cropped.
  */
 export const projectShots = [
-  { src: "/projects/agaspay.webp", alt: "AGASPAY — water billing and usage management platform", width: 1280, height: 585 },
-  { src: "/projects/salestrack.webp", alt: "SalesTrack — sales admin dashboard", width: 1280, height: 632 },
+  { src: asset("/projects/agaspay.webp"), alt: "AGASPAY — water billing and usage management platform", width: 1280, height: 585 },
+  { src: asset("/projects/salestrack.webp"), alt: "SalesTrack — sales admin dashboard", width: 1280, height: 632 },
 ] as const;
 
 /**
@@ -138,9 +148,9 @@ export const aiBuilds: { name: string; icon: "drop" | "chart"; status: "Live" | 
  * owner's request; replace it with your own artwork if its licence is unclear.
  */
 export const aboutPhotos: { src: string }[] = [
-  { src: "/about/patrick-1.webp" },
-  { src: "/about/patrick-2.webp" },
-  { src: "/about/cartoon.webp" },
+  { src: asset("/about/patrick-1.webp") },
+  { src: asset("/about/patrick-2.webp") },
+  { src: asset("/about/cartoon.webp") },
 ];
 
 export const stats = [
