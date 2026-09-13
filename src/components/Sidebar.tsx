@@ -76,7 +76,7 @@ export function Sidebar() {
       {/* ---------- Sidebar panel ---------- */}
       <aside
         id="primary-navigation"
-        className={`no-print scrollbar-hidden fixed inset-y-0 left-0 z-50 flex w-[min(22rem,88vw)] flex-col overflow-y-auto border-r border-line bg-surface px-6 py-8 transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:w-[24rem] lg:shrink-0 lg:translate-x-0 ${
+        className={`no-print scrollbar-hidden fixed inset-y-0 left-0 z-50 flex w-[min(22rem,88vw)] flex-col overflow-y-auto border-r border-line bg-surface px-6 py-8 transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:w-[312px] lg:shrink-0 lg:translate-x-0 lg:px-[30px] lg:pt-[clamp(28px,4vh,52px)] lg:pb-[28px] ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -85,7 +85,7 @@ export function Sidebar() {
           <Link href="/" className="rounded-full">
             <Avatar size="lg" />
           </Link>
-          <h2 className="mt-5 flex items-center gap-2 text-[22px] font-bold text-ink">
+          <h2 className="mt-5 flex items-center gap-2 text-[22px] leading-[1.2] font-bold tracking-[-0.022em] text-ink lg:mt-[20px] lg:gap-[7px]">
             {site.name}
             {/* Facebook-style verified badge: a blue seal with a white check.
                 The white dot sits behind the seal so the check cut-out stays
@@ -96,9 +96,9 @@ export function Sidebar() {
               <span className="sr-only">Verified</span>
             </span>
           </h2>
-          <p className="mt-1 text-[14.5px] text-ink-muted">{site.shortRole}</p>
+          <p className="mt-1 text-[14.5px] tracking-[0.004em] text-ink-muted lg:mt-[5px]">{site.shortRole}</p>
 
-          <ul className="mt-5 flex items-center justify-center gap-2.5">
+          <ul className="mt-5 flex items-center justify-center gap-2.5 lg:mt-[18px] lg:gap-[10px]">
             {site.socials.map((social) => (
               <li key={social.label}>
                 {/* size-auto drops the variant's fixed box so the link keeps its
@@ -109,9 +109,9 @@ export function Sidebar() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-white text-blueberry transition hover:-translate-y-0.5 hover:border-blueberry hover:bg-cream"
+                    className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-white/70 text-blueberry transition hover:-translate-y-px hover:border-line-strong hover:bg-white lg:h-[44px] lg:w-[44px]"
                   >
-                    <Icon name={social.icon as IconName} size={22} weight="fill" />
+                    <Icon name={social.icon as IconName} size={20} weight="fill" />
                     <span className="sr-only">
                       {site.name} on {social.label}
                     </span>
@@ -122,11 +122,13 @@ export function Sidebar() {
           </ul>
         </div>
 
-        <hr className="my-7 border-line" />
-
-        {/* Primary navigation */}
-        <nav aria-label="Primary">
-          <ul className="flex flex-col gap-1.5">
+        {/* Primary navigation — spacing, divider and row sizes copied from the
+            reference sidebar (rail__nav / rail__link). */}
+        <nav
+          aria-label="Primary"
+          className="mt-7 border-t border-line pt-7 lg:mt-[clamp(20px,3vh,32px)] lg:pt-[clamp(18px,2.6vh,28px)]"
+        >
+          <ul className="flex flex-col gap-1.5 lg:gap-[3px]">
             {nav.map((item) => {
               const active = isActive(item.href);
               return (
@@ -134,13 +136,18 @@ export function Sidebar() {
                   <Link
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className={`flex min-h-[3.25rem] items-center gap-3.5 rounded-2xl px-4 text-[16.5px] font-medium transition ${
+                    className={`flex min-h-[3.25rem] items-center gap-3.5 rounded-2xl px-4 text-[16.5px] tracking-[-0.006em] transition lg:min-h-[clamp(42px,5.4vh,48px)] lg:gap-[13px] lg:rounded-[10px] ${
                       active
-                        ? "bg-blueberry text-cream shadow-[0_10px_24px_-14px_rgba(107,53,42,0.9)]"
-                        : "text-ink hover:bg-cream"
+                        ? "bg-[rgba(58,28,22,0.09)] font-semibold text-ink"
+                        : "font-medium text-ink/80 hover:bg-[rgba(58,28,22,0.05)] hover:text-ink"
                     }`}
                   >
-                    <Icon name={item.icon as IconName} size={26} weight={active ? "fill" : "duotone"} />
+                    <Icon
+                      name={item.icon as IconName}
+                      size={21}
+                      weight={active ? "fill" : "duotone"}
+                      className={active ? "text-blueberry" : undefined}
+                    />
                     {item.label}
                   </Link>
                 </li>
@@ -151,8 +158,8 @@ export function Sidebar() {
 
         {/* "Get in touch" lives next to the home headline (Hero.tsx), like the
             reference; the sidebar keeps only the copyright line. */}
-        <div className="mt-auto pt-8">
-          <p className="text-center text-[0.85rem] leading-relaxed text-ink-muted">
+        <div className="mt-auto border-t border-line pt-[clamp(24px,4vh,40px)] lg:pl-[52px]">
+          <p className="text-left text-[12px] leading-[1.7] tracking-[0.004em] text-ink-muted">
             © {new Date().getFullYear()} {site.name}.
             <br />
             All rights reserved.
@@ -164,7 +171,11 @@ export function Sidebar() {
 }
 
 function Avatar({ size }: { size: "sm" | "lg" }) {
-  const dim = size === "lg" ? "h-28 w-28 text-4xl" : "h-10 w-10 text-base";
+  // Desktop size copied from the reference avatar: clamp(132px, 21vh, 190px).
+  const dim =
+    size === "lg"
+      ? "h-28 w-28 text-4xl lg:h-[clamp(132px,21vh,190px)] lg:w-[clamp(132px,21vh,190px)] lg:text-[length:clamp(44px,7vh,62px)]"
+      : "h-10 w-10 text-base";
   return (
     <span
       className={`${dim} flex items-center justify-center rounded-full bg-blueberry font-bold tracking-tight text-cream ring-4 ring-cream`}

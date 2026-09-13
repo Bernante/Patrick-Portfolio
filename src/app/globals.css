@@ -32,8 +32,10 @@
   --color-line: #e6cf7e;
   --color-line-strong: #c9a961;
 
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, sans-serif;
+  /* The reference's font stack: the platform's own UI font (San Francisco on
+     Apple, Segoe UI on Windows), with Poppins only as a fallback. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    system-ui, "Segoe UI Variable Display", "Segoe UI", var(--font-poppins), sans-serif;
 
   --radius-xl2: 1.75rem;
 
