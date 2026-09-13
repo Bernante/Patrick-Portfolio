@@ -90,19 +90,30 @@ export function HomeBento() {
             href="/services"
             description="What I build for coaches, agencies and small teams."
           >
-            <ol className="flex flex-col">
+            {/* One-screen layout: the list fills the card's remaining height and
+                every row gets an equal share (flex-1), so no row is ever pushed
+                out of the card at any zoom. Tile, icon and text sizes scale with
+                that height via container units (cqh), with minimums, copied
+                from the reference's Services card. */}
+            <ol className="flex flex-col fit:h-full fit:overflow-hidden fit:[container-type:size]">
               {services.map((service) => (
                 <li
                   key={service.title}
-                  className="flex items-center gap-3 border-b border-line py-2 last:border-b-0 fit:gap-2 fit:py-[0.3rem]"
+                  className="flex items-center gap-3 border-b border-line py-2 last:border-b-0 fit:min-h-0 fit:flex-1 fit:gap-[clamp(7px,3cqh,10px)] fit:py-0"
                 >
-                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cream-soft fit:h-6 fit:w-6">
-                    <Icon name={service.icon as IconName} size={16} className="text-blueberry" />
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cream-soft fit:h-[clamp(18px,14cqh,28px)] fit:w-[clamp(18px,14cqh,28px)] fit:rounded-[clamp(6px,4.5cqh,9px)]">
+                    <Icon
+                      name={service.icon as IconName}
+                      size={16}
+                      className="text-blueberry fit:h-[clamp(11px,7.5cqh,15px)] fit:w-[clamp(11px,7.5cqh,15px)]"
+                    />
                   </span>
-                  <span className="min-w-0 flex-1 font-medium text-ink fit:truncate fit:text-[0.75rem]">
+                  <span className="min-w-0 flex-1 font-medium text-ink fit:truncate fit:text-[length:clamp(11px,6.8cqh,13.5px)] fit:leading-[1.2]">
                     {service.title}
                   </span>
-                  <span className="text-[0.8rem] text-ink-muted fit:text-[0.68rem]">{service.num}</span>
+                  <span className="text-[0.8rem] text-ink-muted fit:text-[length:clamp(9.5px,5.5cqh,11px)]">
+                    {service.num}
+                  </span>
                 </li>
               ))}
             </ol>
