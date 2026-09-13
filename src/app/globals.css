@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+/* One-screen home layout (see Hero.tsx): only on desktops that are both wide
+   and tall enough for the whole bento to fit without scrolling. */
+@custom-variant fit (@media (min-width: 85rem) and (min-height: 37.5rem));
+
+/* ==========================================================================
+   Design tokens — Clay Brown #6B352A / Soft Butter #FFF1A6
+   (Token names `blueberry-*` / `cream-*` are kept from the first palette so no
+   component classes had to change: `blueberry` = clay brown, `cream` = butter.)
+   Type scale is deliberately large: the baseline is 18px, not 16px, and the
+   reader can push it to 20px or 22px with the text-size control in the sidebar.
+   ========================================================================== */
+
+@theme {
+  /* Brand */
+  --color-blueberry: #6b352a; /* Clay Brown */
+  --color-blueberry-700: #55291f;
+  --color-blueberry-900: #3a1c16;
+  --color-blueberry-300: #b98476;
+  --color-cream: #fff1a6; /* Soft Butter */
+  --color-cream-soft: #fff8d6;
+  --color-cream-deep: #f5e08a;
+
+  /* Semantic */
+  --color-page: #fff1a6;
+  --color-surface: #fffdf2;
+  --color-surface-2: #ffffff;
+  --color-ink: #3a1c16; /* 13.6:1 on butter */
+  --color-ink-soft: #6b352a; /*  8.5:1 on butter */
+  --color-ink-muted: #5e4036; /*  8.1:1 on butter — still AAA */
+  --color-line: #e6cf7e;
+  --color-line-strong: #c9a961;
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  --radius-xl2: 1.75rem;
+
+  /* Wide-desktop breakpoint for the home bento's 4-column layout. At 18px
+     base type the cards need ~1760px of viewport before four columns fit. */
+  --breakpoint-3xl: 110rem;
+
+  --shadow-card: 0 1px 2px rgba(58, 28, 22, 0.05),
+    0 8px 24px -12px rgba(58, 28, 22, 0.2);
+  --shadow-lift: 0 2px 4px rgba(58, 28, 22, 0.07),
+    0 18px 40px -18px rgba(58, 28, 22, 0.34);
+
+  /* ------------------------------------------------------------------
+     shadcn/ui token names, mapped onto the Blueberry / Cream palette.
+     Components dropped into components/ui use `bg-background`,
+     `text-muted-foreground`, `border-border` and friends — pointing those
+     at the brand colours here means any shadcn component inherits this
+     design system instead of arriving grey.
+     ------------------------------------------------------------------ */
+  --color-background: #fff1a6;
+  --color-foreground: #3a1c16;
+  --color-card: #ffffff;
+  --color-card-foreground: #3a1c16;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #3a1c16;
+  --color-primary: #6b352a;
+  --color-primary-foreground: #fff1a6;
+  --color-secondary: #fff8d6;
+  --color-secondary-foreground: #6b352a;
+  --color-muted: #fff8d6;
+  --color-muted-foreground: #5e4036;
+  --color-accent: #fff1a6;
+  --color-accent-foreground: #6b352a;
+  --color-destructive: #9b1c1c;
+  --color-destructive-foreground: #fff1a6;
+  --color-border: #e6cf7e;
+  --color-input: #c9a961;
+  --color-ring: #6b352a;
+
+  --radius: 1rem;
+}
+
+/* ==========================================================================
+   Base — accessibility-first sizing
+   ========================================================================== */
+
+:root {
+  /* 15px, the reference's body size (portfolio.brewedops.cloud). Text sized
+     in rem scales from this; the reference's exact px/clamp sizes are set on
+     the sidebar, headings, marquee and bento directly. */
+  --base-font-size: 15px;
+  color-scheme: light;
+}
+
+html {
+  font-size: var(--base-font-size);
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* These live in @layer base so Tailwind's utilities (a later layer) can still
+   override them — an unlayered rule here would beat every `text-*` utility and
+   silently break headings on dark panels. */
+@layer base {
+  body {
+    background-color: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Generous, readable defaults rather than Tailwind's tight ones. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: var(--color-ink);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* A focus ring you cannot miss — 3px, offset, always visible on keyboard nav. */
+  :focus-visible {
+    outline: 3px solid var(--color-blueberry);
+    outline-offset: 3px;
+    border-radius: 0.35rem;
+  }
+
+  ::selection {
+    background: var(--color-blueberry);
+    color: var(--color-cream);
+  }
+
+  /* Every interactive element clears the 48×48 target guideline. */
+  a,
+  button {
+    touch-action: manipulation;
+  }
+}
+
+/* ==========================================================================
+   Motion preferences — honour the OS setting completely
+   The tools marquee opts out in JS (see ToolsMarquee.tsx), because its
+   animation is driven by `motion`, not CSS.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Home Projects card: vertical screenshot reel (see HomeBento.tsx). The track
+   holds its frames twice, so moving up exactly half its height loops seamlessly. */
+@keyframes reel-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+/* Home AI Builds card: sideways chip rows (see HomeBento.tsx). Same idea as
+   reel-up — each track holds its chips twice, so moving left exactly half its
+   width loops seamlessly. The second row runs it in reverse to drift right. */
+@keyframes drift-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ==========================================================================
+   Scroll reveal — progressive enhancement
+   Content is visible by default. Only once JS has run (html.js) is it hidden
+   ready to animate, so a blocked or slow script can never blank the page.
+   ========================================================================== */
+
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+html.js .reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+html.js .reveal.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Reduced motion: show everything immediately, no movement, no delay. */
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal,
+  html.js .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+/* In @layer components so per-element utilities (a different radius, a
+   different border colour) still win where a component opts out. */
+@layer components {
+  .card {
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl2);
+    box-shadow: var(--shadow-card);
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.35s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--color-line-strong);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Thin, quiet scrollbars that still meet contrast when visible. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+/* Hides the scrollbar visually while the element stays fully scrollable —
+   wheel, trackpad, touch, keyboard and programmatic scrolling all still work.
+   Left unlayered on purpose: the `*` rule above is unlayered too, so a layered
+   rule here would lose to it regardless of specificity. */
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox + standard */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+
+/* Removes the track, thumb and the stepper arrows in WebKit/Blink. */
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Print: drop the chrome, keep the content readable. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

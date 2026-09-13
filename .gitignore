@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.pem
+npm-debug.log*
+.env*
+!.env.example
+next-env.d.ts
+.vercel
+*.tsbuildinfo
+
+# Session archive: large raw log with full file contents and screenshots.
+# Remove this rule if you want the transcript committed.
+docs/session/
