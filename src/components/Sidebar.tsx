@@ -149,15 +149,10 @@ export function Sidebar() {
           </ul>
         </nav>
 
+        {/* "Get in touch" lives next to the home headline (Hero.tsx), like the
+            reference; the sidebar keeps only the copyright line. */}
         <div className="mt-auto pt-8">
-          <Link
-            href="/contact"
-            className="flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl bg-blueberry px-5 text-[1.05rem] font-semibold text-cream transition hover:bg-blueberry-700"
-          >
-            Get in touch
-            <Icon name="arrow-up-right" size={20} weight="bold" />
-          </Link>
-          <p className="mt-5 text-center text-[0.85rem] leading-relaxed text-ink-muted">
+          <p className="text-center text-[0.85rem] leading-relaxed text-ink-muted">
             © {new Date().getFullYear()} {site.name}.
             <br />
             All rights reserved.
