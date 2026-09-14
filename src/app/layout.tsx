@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { JsonLd } from "@/components/JsonLd";
+import { FloatingThemeToggle } from "@/components/FloatingThemeToggle";
 import { MobileTabBar } from "@/components/MobileTabBar";
 import { ParticlesBackdrop } from "@/components/ParticlesBackdrop";
 import { PerfTier } from "@/components/PerfTier";
@@ -152,12 +153,15 @@ export default function RootLayout({
                 viewport height (32px on short laptops up to 54px), like the
                 reference, so the bento keeps its height; Hero.tsx subtracts the
                 same clamp. */}
-            <main id="main" className="min-w-0 flex-1 px-5 py-10 pb-36 sm:px-6 [@media(max-height:500px)]:pb-10 lg:px-[56px] lg:py-12 fit:has-[#home]:py-[clamp(32px,5vh,54px)]">
+            {/* Phones/tablets, like the reference: 20px sides, 22px top and
+                96px bottom (clears the tab bar), plus the iPhone safe areas. */}
+            <main id="main" className="min-w-0 flex-1 px-[20px] pt-[calc(22px+env(safe-area-inset-top,0px))] pb-[calc(96px+env(safe-area-inset-bottom,0px))] [@media(max-height:500px)]:pb-10 lg:px-[56px] lg:py-12 fit:has-[#home]:py-[clamp(32px,5vh,54px)]">
               <div className="flex w-full flex-col gap-20 lg:gap-24 fit:[&:has(#home)>footer]:hidden">
                 {/* On one-screen desktops the home page has no footer (see Hero.tsx). */}
                 {children}
 
-                <footer className="border-t border-line-strong pt-8 pb-2">
+                {/* Desktop only: the reference's phone pages end without a footer. */}
+                <footer className="hidden border-t border-line-strong pt-8 pb-2 lg:block">
                   <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <p className="text-[1rem] text-ink-muted">
                       © {new Date().getFullYear()} {site.name}. Built with Next.js.
@@ -170,6 +174,7 @@ export default function RootLayout({
           </div>
 
           <MobileTabBar />
+          <FloatingThemeToggle />
         </CustomCursor>
       </body>
     </html>

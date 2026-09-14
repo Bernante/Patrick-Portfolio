@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { FluidParticlesBackground } from "@/components/ui/fluid-particles-background";
 import { PERF_TIER_EVENT, readPerfTier, type PerfTier } from "@/lib/perf-tier";
 
-/** Same breakpoint as the sidebar layout (Tailwind `lg`). */
-const DESKTOP = "(min-width: 1024px)";
+/** Same breakpoint as the sidebar layout (Tailwind `lg`, 1100px). */
+const DESKTOP = "(min-width: 1100px)";
 
 /**
  * Particle settings per performance tier (see src/lib/perf-tier.ts). `density`

@@ -201,6 +201,17 @@ export const services = [
   },
 ] as const;
 
+/**
+ * Facts row under the home headline on phones (like the reference's stats).
+ * Only facts already stated on the site: the services count, the time zone,
+ * and the one-business-day reply promised on the Contact page.
+ */
+export const homeFacts = [
+  { value: String(services.length), label: "Services" },
+  { value: "GMT+8", label: "PH time" },
+  { value: "1 day", label: "Reply time" },
+] as const;
+
 export const process = [
   {
     step: "01",

@@ -22,7 +22,9 @@ export function SectionHeading({
   as: Heading = "h1",
 }: Props) {
   return (
-    <header className="max-w-3xl">
+    // On phones/tablets the right padding keeps the title clear of the floating
+    // theme button, as on the reference.
+    <header className="max-w-3xl max-lg:pr-[56px]">
       {/* Sizes copied from the reference's page header (pgrid__eyebrow /
           pgrid__title / pgrid__lede). */}
       <p className="flex items-center gap-2.5 text-[12px] font-semibold tracking-[0.08em] text-ink-muted uppercase">

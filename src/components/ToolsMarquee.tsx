@@ -27,7 +27,7 @@ export function ToolsMarquee() {
       className="group rounded-[2rem] border border-line [background:var(--glass-bg-tools)] p-2 shadow-card"
     >
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
-        <div className="shrink-0 px-5 py-3 lg:py-2 lg:pr-6">
+        <div className="shrink-0 px-5 py-3 max-sm:px-[6px] max-sm:pt-[4px] max-sm:pb-[2px] lg:py-2 lg:pr-6">
           {/* Clay Brown: ~9.7:1 on white, readable at this small size. */}
           <p className="text-[12px] font-semibold tracking-[0.08em] text-blueberry uppercase">
             Daily drivers
@@ -39,7 +39,7 @@ export function ToolsMarquee() {
 
         <span aria-hidden="true" className="hidden h-12 w-px shrink-0 bg-line lg:block" />
 
-        <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-2xl border border-line bg-white py-3.5 lg:ml-3">
+        <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-2xl border border-line bg-white py-3.5 max-sm:rounded-[12px] max-sm:py-[10px] lg:ml-3">
           {/* Moving strip: CSS only, paused while the strip is hovered. */}
           <div
             aria-hidden="true"
@@ -75,7 +75,7 @@ export function ToolsMarquee() {
 
 function ToolItem({ name, logo }: { name: string; logo: string }) {
   return (
-    <span className="flex shrink-0 items-center gap-3 border-r border-line px-10">
+    <span className="flex shrink-0 items-center gap-3 border-r border-line px-10 max-sm:gap-[8px] max-sm:px-[14px]">
       {/* Decorative: the visible label right beside it already names the tool,
           so an alt here would make screen readers say it twice. */}
       <img
@@ -86,9 +86,9 @@ function ToolItem({ name, logo }: { name: string; logo: string }) {
         height={24}
         loading="lazy"
         decoding="async"
-        className="pointer-events-none h-6 w-6 shrink-0 object-contain select-none"
+        className="pointer-events-none h-6 w-6 shrink-0 object-contain select-none max-sm:h-[18px] max-sm:w-[18px]"
       />
-      <span className="text-[13.5px] font-semibold whitespace-nowrap text-ink">{name}</span>
+      <span className="text-[13.5px] font-semibold whitespace-nowrap text-ink max-sm:text-[12px]">{name}</span>
     </span>
   );
 }

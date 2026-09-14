@@ -44,7 +44,7 @@ export function ContactForm() {
   };
 
   const field =
-    "mt-2 block w-full rounded-2xl border border-line-strong bg-white px-4 py-3.5 text-[1.05rem] text-ink placeholder:text-ink-muted/60 focus:border-blueberry";
+    "mt-2 block w-full rounded-2xl border border-line-strong bg-white px-4 py-3.5 text-[16px] text-ink placeholder:text-ink-muted/60 focus:border-blueberry"; // 16px: iPhones zoom into smaller inputs
   const label = "block text-[1rem] font-semibold text-ink";
 
   return (
@@ -110,7 +110,7 @@ export function ContactForm() {
 
       <button
         type="submit"
-        className="inline-flex min-h-[3.5rem] items-center justify-center gap-2.5 rounded-2xl bg-blueberry px-7 text-[1.1rem] font-semibold text-cream transition hover:-translate-y-0.5 hover:bg-blueberry-700"
+        className="inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl bg-blueberry px-7 text-[1.1rem] font-semibold text-cream transition hover:-translate-y-0.5 hover:bg-blueberry-700 active:scale-[0.98] sm:w-auto"
       >
         Send message
         <Icon name="send" size={22} weight="fill" />

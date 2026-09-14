@@ -79,7 +79,7 @@ export function About() {
             </p>
           </div>
 
-          <dl className="grid gap-4 border-t border-line pt-5 sm:grid-cols-2">
+          <dl className="grid gap-4 border-t border-line pt-5 min-[721px]:grid-cols-2">
             <div className="flex items-start gap-3">
               <Icon name="pin" size={26} weight="duotone" className="mt-0.5 shrink-0 text-blueberry" />
               <div>
