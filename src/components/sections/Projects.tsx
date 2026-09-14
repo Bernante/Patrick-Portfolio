@@ -7,29 +7,36 @@ import { Icon } from "../Icon";
 import { Reveal } from "../Reveal";
 
 /**
- * Projects page, copied from the reference (portfolio.brewedops.cloud/projects)
- * but only the cards the owner picked: Automations, Funnels and sites, and the
- * three stacked build cards (GoHighLevel blueprint, How I build with AI, How I
- * ship end to end). Sizes, spacing and hover motion follow the reference CSS.
+ * Projects page in the reference's visual language (portfolio.brewedops.cloud/
+ * projects), rebuilt for exactly four cards.
  *
- * Phones and tablets (below 1100px), like the reference:
- *  - A filter pill (All · GHL · Funnels · AI) above the cards; it only filters
- *    in the phone layout, desktop always shows everything.
- *  - A 2-column grid 10px apart; every card here spans both columns (there is
- *    no second small card to pair Funnels with).
- *  - The Automations screens drift sideways in a 150px strip instead of up.
- *  - Titles 14px and descriptions 12px under 640px; the header leaves room for
- *    the floating theme button.
+ * Desktop (1100px+): the glass panel fills the screen height (same spacing as
+ * the reference page) and holds a 12-column, 2-row grid with the wide cards
+ * on opposite corners so the weight balances left/right and top/bottom:
  *
- * Automations shows the owner's real workflow screenshots (AUTOMATIONS below)
- * plus blank slots for future ones; pressing the card opens the full-size
- * pop-up. The Funnels pages stay blank until the owner supplies screenshots.
- * Logos are tool logos that already ship with the site.
+ *   ┌──────────── Automations (7) ────────────┬──── Funnels and sites (5) ────┐
+ *   ├──── How I build with AI (5) ────┬───────── Apps and extensions (7) ───────┤
+ *
+ * Both rows share the height equally, so there is no dead space under the
+ * cards at any desktop size. Wide cards put copy on the left and moving media
+ * on the right; the narrower cards stack copy over media that grows to fill.
+ *
+ * Phones/tablets (below 1100px): a filter pill, then a 2-column grid 10px apart.
+ * Automations and Apps span both columns; Funnels and How I build with AI pair
+ * up from 640px and span both columns on small phones.
+ *
+ * Content comes from the site: the Automations screenshot, the AGASPAY and
+ * SalesTrack screenshots and names, and tool logos that already ship with it.
  */
 
 const GHL_LOGO = asset("/logos/gohighlevel.png");
 const N8N_LOGO = asset("/logos/n8n.svg");
 const CLAUDE_LOGO = asset("/logos/claude.svg");
+const CHATGPT_LOGO = asset("/logos/chatgpt.webp");
+const VSCODE_LOGO = asset("/logos/vscode.png");
+const PLAY_LOGO = asset("/logos/googleplay.svg");
+const EXPO_LOGO = asset("/logos/expo.svg");
+const CHROME_LOGO = asset("/logos/googlechrome.svg");
 
 type Shot = { title: string; src: string; width: number; height: number } | { title: string; src: null };
 
@@ -49,29 +56,27 @@ const AUTOMATIONS: Shot[] = [
   { title: "Coming soon", src: null },
 ];
 
-type Category = "ghl" | "funnels" | "ai";
+type Category = "ghl" | "funnels" | "apps" | "ai";
 type Filter = "all" | Category;
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "ghl", label: "GHL" },
   { key: "funnels", label: "Funnels" },
+  { key: "apps", label: "Apps" },
   { key: "ai", label: "AI" },
-];
-
-/** Stacked build cards. Titles and descriptions are placeholders until the owner provides them. */
-const BUILDS: { kicker: string; logo: string; title: string; desc: string; cats: Category[] }[] = [
-  { kicker: "GoHighLevel blueprint", logo: GHL_LOGO, title: "Coming soon", desc: "The full GoHighLevel build will be added here soon.", cats: ["ghl"] },
-  { kicker: "How I build with AI", logo: CLAUDE_LOGO, title: "Coming soon", desc: "The tools, rules and loop I build with will be added here soon.", cats: ["ai"] },
-  { kicker: "How I ship, end to end", logo: CLAUDE_LOGO, title: "Coming soon", desc: "The end-to-end workflow will be added here soon.", cats: ["ai"] },
 ];
 
 /** Shared card box: the reference bento card (padding, 22px corners, hover lift). */
 const CARD =
-  "group card card-hover relative min-h-0 min-w-0 overflow-hidden rounded-[22px] bg-surface px-[clamp(12px,1.1vw,18px)] py-[clamp(12px,1.4vh,18px)]";
+  "group card card-hover relative min-h-0 min-w-0 overflow-hidden rounded-[22px] bg-surface px-[clamp(12px,1.1vw,18px)] py-[clamp(12px,1.4vh,18px)] max-lg:p-[12px]";
 
-/** Row height on desktop, from the reference's one-screen grid (≈330px at 940px tall, ≈255px at 734px). */
-const ROW_H = "xl:h-[clamp(240px,35vh,340px)]";
+/**
+ * Desktop panel height: the screen minus the reference page's spacing and the
+ * header above it (eyebrow, title, lede), so the grid ends just above the fold.
+ */
+const PANEL_H =
+  "lg:h-[max(480px,calc(100dvh-clamp(28px,5vh,64px)-34px-clamp(30px,3.1vw,60px)*1.06-clamp(14px,1vw,19px)*1.6-clamp(16px,2.6vh,34px)-clamp(16px,3vh,32px)))]";
 
 export function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
@@ -83,13 +88,15 @@ export function Projects() {
     openerRef.current?.focus();
   }, []);
 
-  const shows = (cats: Category[]) => filter === "all" || cats.includes(filter);
   // Filtering only applies to the phone layout; desktop always shows all cards.
-  const phoneHidden = (cats: Category[]) => (shows(cats) ? "" : "max-lg:hidden");
-  const anyBuildShown = BUILDS.some((build) => shows(build.cats));
+  const phoneHidden = (cat: Category) => (filter === "all" || filter === cat ? "" : "max-lg:hidden");
 
   return (
-    <section id="projects" aria-labelledby="projects-heading" className="scroll-mt-8">
+    <section
+      id="projects"
+      aria-labelledby="projects-heading"
+      className="scroll-mt-8 lg:mx-[calc(min(4vw,64px)-56px)] lg:mt-[calc(clamp(28px,5vh,64px)-3rem)] lg:mb-[calc(clamp(16px,3vh,32px)-3rem)]"
+    >
       {/* Page header copied from the reference (pgrid__head): eyebrow, title
           and lede, 8px apart, no icon tile. */}
       <header className="flex flex-col gap-[8px] max-lg:pr-[56px]">
@@ -128,11 +135,13 @@ export function Projects() {
       </div>
 
       <Reveal className="mt-[clamp(16px,2.6vh,34px)] block">
-        <div className="rounded-[2rem] border border-line [background:var(--glass-bg)] px-[clamp(14px,1.4vw,24px)] py-[clamp(14px,2vh,24px)] [box-shadow:var(--glass-shadow)]">
-          <ul className="grid grid-cols-2 gap-[10px] lg:gap-[clamp(10px,1vw,16px)] xl:grid-cols-4">
-            {/* ---- Automations (two columns wide) ---- */}
+        <div
+          className={`rounded-[28px] border border-line [background:var(--glass-bg)] px-[clamp(14px,1.4vw,24px)] py-[clamp(14px,2vh,24px)] [box-shadow:var(--glass-shadow)] max-sm:p-[12px] max-sm:rounded-[22px] ${PANEL_H}`}
+        >
+          <ul className="grid grid-cols-2 gap-[10px] lg:h-full lg:grid-cols-12 lg:grid-rows-[repeat(2,minmax(0,1fr))] lg:gap-[clamp(10px,1vw,16px)]">
+            {/* ---- 1. Automations: wide, top left ---- */}
             <li
-              className={`${CARD} ${ROW_H} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] [transition:transform_.35s_cubic-bezier(0.22,1,0.36,1),box-shadow_.35s,border-color_.35s,scale_.34s_cubic-bezier(0.2,0.8,0.2,1)] active:scale-[0.97] lg:grid lg:grid-cols-2 lg:gap-x-[14px] lg:gap-y-3 ${phoneHidden(["ghl"])}`}
+              className={`${CARD} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] [transition:transform_.35s_cubic-bezier(0.22,1,0.36,1),box-shadow_.35s,border-color_.35s,scale_.34s_cubic-bezier(0.2,0.8,0.2,1)] active:scale-[0.97] lg:col-span-7 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-x-[clamp(12px,1.2vw,20px)] ${phoneHidden("ghl")}`}
             >
               {/* The whole card is one button that opens the pop-up (reference: bento__card--btn). */}
               <button
@@ -143,7 +152,7 @@ export function Projects() {
                 onClick={() => setAutomationsOpen(true)}
                 className="absolute inset-0 z-[1] cursor-pointer rounded-[22px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blueberry"
               />
-              <div className="relative min-w-0">
+              <div className="relative flex min-w-0 flex-col">
                 <CardHead
                   logos={[GHL_LOGO, N8N_LOGO]}
                   title="Automations"
@@ -156,25 +165,41 @@ export function Projects() {
                 >
                   <Icon name="arrow-up-right" size={18} weight="bold" />
                 </span>
+                <span className="mt-auto hidden pt-[12px] text-[11px] font-semibold tracking-[0.08em] text-ink-muted uppercase lg:block">
+                  Open the screens
+                </span>
               </div>
               <ScreenReel />
             </li>
 
-            {/* ---- Funnels and sites ---- */}
-            <li className={`${CARD} ${ROW_H} col-span-2 flex flex-col lg:col-span-1 ${phoneHidden(["funnels"])}`}>
+            {/* ---- 2. Funnels and sites: top right ---- */}
+            <li className={`${CARD} col-span-2 flex flex-col sm:col-span-1 lg:col-span-5 ${phoneHidden("funnels")}`}>
               <CardHead logos={[GHL_LOGO]} title="Funnels and sites" description="Complete funnel builds and websites." />
               <PageFan />
             </li>
 
-            {/* ---- Stacked build cards ---- */}
+            {/* ---- 3. How I build with AI: bottom left ---- */}
+            <li className={`${CARD} col-span-2 flex flex-col sm:col-span-1 lg:col-span-5 ${phoneHidden("ai")}`}>
+              <CardHead
+                logos={[CLAUDE_LOGO, CHATGPT_LOGO, VSCODE_LOGO]}
+                title="How I build with AI"
+                description="The tools, rules and loop I build with will be added here soon."
+              />
+              <AiLoop />
+            </li>
+
+            {/* ---- 4. Apps and extensions: wide, bottom right ---- */}
             <li
-              className={`${ROW_H} col-span-2 grid min-h-0 min-w-0 gap-[clamp(8px,0.9vw,12px)] lg:col-span-1 xl:grid-rows-3 ${
-                anyBuildShown ? "" : "max-lg:hidden"
-              }`}
+              className={`${CARD} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] lg:col-span-7 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-x-[clamp(12px,1.2vw,20px)] ${phoneHidden("apps")}`}
             >
-              {BUILDS.map(({ cats, ...build }) => (
-                <BuildCard key={build.kicker} {...build} className={phoneHidden(cats)} />
-              ))}
+              <div className="flex min-w-0 flex-col">
+                <CardHead
+                  logos={[PLAY_LOGO, EXPO_LOGO, CHROME_LOGO]}
+                  title="Apps and extensions"
+                  description="Mobile apps and Chrome extensions will be added here soon."
+                />
+              </div>
+              <AppReel />
             </li>
           </ul>
         </div>
@@ -249,9 +274,10 @@ function ScreenReel() {
       aria-hidden="true"
       className="flex h-[150px] min-h-0 items-center overflow-hidden rounded-[14px] mask-[linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] lg:block lg:h-full lg:mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]"
     >
-      <div className="flex w-max animate-[drift-left_26s_linear_infinite] [animation-play-state:paused] group-focus-within:[animation-play-state:running] group-hover:[animation-play-state:running] lg:block lg:w-auto lg:animate-[reel-up_22s_linear_infinite]">
+      {/* Play state is !important: the responsive animate-[] shorthand would otherwise reset it to running. */}
+      <div className="flex w-max animate-[drift-left_26s_linear_infinite] [animation-play-state:paused]! group-focus-within:[animation-play-state:running]! group-hover:[animation-play-state:running]! lg:block lg:w-auto lg:animate-[reel-up_22s_linear_infinite]">
         {[...AUTOMATIONS, ...AUTOMATIONS].map((shot, i) => (
-          <div key={i} className="w-[200px] pr-[10px] lg:w-auto lg:pr-0 lg:pb-[10px]">
+          <div key={i} className="w-[200px] pr-[10px] lg:mx-auto lg:w-[min(100%,36vh)] lg:pr-0 lg:pb-[10px]">
             <div className="relative rounded-[12px] bg-white px-[4px] pt-[18px] pb-[4px] shadow-[inset_0_0_0_1px_var(--color-line),0_6px_18px_-14px_rgba(6,12,26,0.5)]">
               <span className="absolute top-[7px] left-[9px] flex gap-[4px]">
                 <WindowDots size={6} />
@@ -271,6 +297,81 @@ function ScreenReel() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Apps media: empty window frames drifting sideways (reference:
+ * bento__reel--row, 28s per loop) with an 8% side fade. No photos until the
+ * owner has apps or extensions to show. Paused until hover or focus.
+ */
+const APP_FRAMES = 8;
+
+function AppReel() {
+  const shots = Array.from({ length: APP_FRAMES });
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-[150px] min-h-0 items-center overflow-hidden rounded-[14px] mask-[linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] lg:h-full"
+    >
+      <div className="flex w-max animate-[drift-left_28s_linear_infinite] [animation-play-state:paused]! group-focus-within:[animation-play-state:running]! group-hover:[animation-play-state:running]! motion-reduce:animate-none">
+        {shots.map((_, i) => (
+          <div key={i} className="w-[210px] pr-[10px] lg:w-[clamp(200px,17vw,340px)] lg:pr-[12px]">
+            <div className="relative rounded-[12px] bg-white px-[4px] pt-[18px] pb-[4px] shadow-[inset_0_0_0_1px_var(--color-line),0_6px_18px_-14px_rgba(6,12,26,0.5)]">
+              <span className="absolute top-[7px] left-[9px] flex gap-[4px]">
+                <WindowDots size={6} />
+              </span>
+              <div className="aspect-[16/10] rounded-[7px] bg-cream-soft" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * How I build with AI media: a small document card in the reference's
+ * bento__doc style showing the tools the site already lists (Claude, ChatGPT,
+ * VS Code) linked in a loop, with faint text lines under it. It fills and
+ * centres in the space left under the card head; hover lifts it 3px.
+ */
+const LOOP_TOOLS = [
+  { name: "Claude", logo: CLAUDE_LOGO },
+  { name: "ChatGPT", logo: CHATGPT_LOGO },
+  { name: "VS Code", logo: VSCODE_LOGO },
+];
+
+function AiLoop() {
+  return (
+    <div aria-hidden="true" className="mt-[clamp(8px,1.2vh,14px)] grid min-h-[130px] flex-1 place-items-center">
+      {/* Grows with the screen on desktop so it fills large cards; on short 1100–1279px cards the eyebrow and text lines hide so it never clips. */}
+      <div className="flex w-full max-w-[420px] flex-col gap-[8px] rounded-[12px] bg-white px-[14px] pt-[14px] pb-[12px] shadow-[inset_0_0_0_1px_var(--color-line),0_14px_30px_-22px_rgba(58,28,22,0.45)] transition-transform duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[3px] lg:max-w-[clamp(300px,27vw,540px)] lg:gap-[clamp(6px,0.55vw,11px)] lg:px-[clamp(12px,1.1vw,22px)] lg:pt-[clamp(10px,1.1vw,20px)] lg:pb-[clamp(10px,1vw,18px)]">
+        <span className="text-[9px] font-semibold tracking-[0.12em] text-[#b4490a] uppercase max-sm:text-[10.5px] lg:text-[length:clamp(9px,0.62vw,12px)] lg:max-[1279px]:hidden dark:text-[#ff9a4d]">
+          The build loop
+        </span>
+        <span className="text-[length:clamp(13px,0.9vw,19px)] leading-[1.2] font-bold tracking-[-0.01em] text-ink">Coming soon</span>
+        <span className="mt-[2px] flex flex-wrap items-center gap-[6px]">
+          {LOOP_TOOLS.map((tool, i) => (
+            <span key={tool.name} className="inline-flex items-center gap-[6px]">
+              <span
+                className={`inline-flex items-center gap-[5px] rounded-[7px] border px-[7px] py-[3px] text-[10px] font-semibold max-sm:text-[11px] lg:text-[length:clamp(10px,0.7vw,13.5px)] ${
+                  i === LOOP_TOOLS.length - 1
+                    ? "border-[#ff7a1a] bg-[#ff7a1a] text-[#fff]"
+                    : "border-line-strong text-ink"
+                }`}
+              >
+                <img src={tool.logo} alt="" width={12} height={12} className="h-[1.2em] w-[1.2em] rounded-[3px] bg-white object-contain" />
+                {tool.name}
+              </span>
+              {i < LOOP_TOOLS.length - 1 && <Icon name="arrow-right" size={11} weight="bold" className="text-ink-muted" />}
+            </span>
+          ))}
+        </span>
+        <span className="h-[6px] rounded-[3px] bg-[var(--tint-strong)] lg:max-[1279px]:hidden" />
+        <span className="h-[6px] w-[60%] rounded-[3px] bg-[var(--tint-strong)] lg:max-[1279px]:hidden" />
       </div>
     </div>
   );
@@ -370,72 +471,28 @@ function AutomationsModal({ onClose }: { onClose: () => void }) {
 /**
  * Funnels media: three blank 3:4 pages fanned like the reference (and the home
  * About card) — rotate ±9° and slide 26px at rest; ±11° and 30px with a 2px
- * lift on hover. Blank until real page screenshots are added.
+ * lift on hover. On desktop the pages scale with the card height so the fan
+ * fills its space. Blank until real page screenshots are added.
  */
 const FAN = [
-  "[transform:rotate(-9deg)_translateX(-26px)] group-hover:[transform:rotate(-11deg)_translateX(-30px)_translateY(-2px)] group-focus-within:[transform:rotate(-11deg)_translateX(-30px)_translateY(-2px)]",
+  "[transform:rotate(-9deg)_translateX(-26%)] group-hover:[transform:rotate(-11deg)_translateX(-30%)_translateY(-2px)] group-focus-within:[transform:rotate(-11deg)_translateX(-30%)_translateY(-2px)]",
   "group-hover:[transform:translateY(-2px)] group-focus-within:[transform:translateY(-2px)]",
-  "[transform:rotate(9deg)_translateX(26px)] group-hover:[transform:rotate(11deg)_translateX(30px)_translateY(-2px)] group-focus-within:[transform:rotate(11deg)_translateX(30px)_translateY(-2px)]",
+  "[transform:rotate(9deg)_translateX(26%)] group-hover:[transform:rotate(11deg)_translateX(30%)_translateY(-2px)] group-focus-within:[transform:rotate(11deg)_translateX(30%)_translateY(-2px)]",
 ] as const;
 
 function PageFan() {
   return (
     <div
       aria-hidden="true"
-      className="mt-[clamp(8px,1.2vh,14px)] grid min-h-[150px] flex-1 place-items-center xl:min-h-0"
+      className="mt-[clamp(8px,1.2vh,14px)] grid min-h-[150px] flex-1 place-items-center lg:min-h-0 lg:py-[6px]"
     >
       {FAN.map((fan, i) => (
         <span
           key={i}
-          className={`col-start-1 row-start-1 aspect-[3/4] w-[clamp(72px,5.6vw,96px)] rounded-[12px] bg-[var(--plate)] shadow-[0_0_0_3px_var(--plate-ring),0_14px_30px_-14px_rgba(6,12,26,0.6)] transition-transform duration-[520ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${fan}`}
+          className={`col-start-1 row-start-1 aspect-[3/4] w-[96px] rounded-[12px] bg-[var(--plate)] shadow-[0_0_0_3px_var(--plate-ring),0_14px_30px_-14px_rgba(6,12,26,0.6)] transition-transform duration-[520ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:h-full lg:max-h-[190px] lg:w-auto ${fan}`}
           style={{ zIndex: i + 1 }}
         />
       ))}
-    </div>
-  );
-}
-
-/**
- * Stacked build card from the reference: 38px logo plate, kicker, title,
- * two-line description and a round arrow that nudges up-right on hover.
- */
-function BuildCard({
-  kicker,
-  logo,
-  title,
-  desc,
-  className = "",
-}: {
-  kicker: string;
-  logo: string;
-  title: string;
-  desc: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`group card card-hover grid min-h-[84px] min-w-0 grid-cols-[38px_minmax(0,1fr)_26px] items-center gap-x-[12px] overflow-hidden rounded-[16px] bg-surface px-[clamp(10px,0.9vw,14px)] py-[clamp(8px,1vh,12px)] xl:min-h-0 ${className}`}
-    >
-      <span className="grid h-[38px] w-[38px] place-items-center rounded-[11px] bg-white shadow-[inset_0_0_0_1px_var(--color-line)]">
-        <img src={logo} alt="" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
-      </span>
-      <span className="flex min-w-0 flex-col gap-[1px]">
-        <span className="truncate text-[8.5px] font-bold tracking-[0.12em] text-blueberry uppercase max-sm:text-[10.5px]">
-          {kicker}
-        </span>
-        <h3 className="truncate text-[length:clamp(12px,0.85vw,14px)] leading-[1.2] font-bold tracking-[-0.01em] text-ink">
-          {title}
-        </h3>
-        <span className="line-clamp-2 text-[length:clamp(9.5px,0.62vw,11px)] leading-[1.35] text-ink-muted max-sm:text-[12px]">
-          {desc}
-        </span>
-      </span>
-      <span
-        aria-hidden="true"
-        className="grid h-[26px] w-[26px] place-items-center rounded-full border border-line-strong text-ink transition-[translate,border-color,color] duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:translate-x-[2px] group-hover:-translate-y-[2px] group-hover:border-blueberry group-hover:text-blueberry"
-      >
-        <Icon name="arrow-up-right" size={13} weight="bold" />
-      </span>
     </div>
   );
 }

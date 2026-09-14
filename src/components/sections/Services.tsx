@@ -109,10 +109,10 @@ export function Services() {
           id="services-heading"
           className="text-[length:clamp(30px,3.1vw,60px)] leading-[1.06] font-bold tracking-[-0.028em] text-ink lg:text-[length:clamp(26px,2vw,40px)]"
         >
-          Automation, CRM, funnels, sites and AI agents.
+          Automation, CRM, funnels, websites, and AI agents.
         </h1>
         <p className="text-[length:clamp(14px,1vw,19px)] leading-[1.6] text-ink-muted max-lg:font-medium lg:text-[length:clamp(13px,0.9vw,16px)]">
-          What I build, how it works, and what you get.
+          The systems I build, how they work, and what you get.
         </p>
       </header>
 
