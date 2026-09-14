@@ -1,43 +1,30 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useReducedMotion } from "motion/react";
-import { InfiniteSlider } from "@/components/ui/logo-marquee";
 import { tools } from "@/lib/site";
 
 /**
- * "Tools I work with" — built on the InfiniteSlider from components/ui.
+ * "Tools I work with" strip.
  *
- * Layout: an outer pill that fades to butter yellow on its right edge, holding a
- * label block, a hairline divider, and an inner white track where tools sit as
- * plain logo + name entries separated by thin vertical rules.
+ * Layout: an outer pill that fades to butter yellow on its right edge (dark:
+ * espresso), holding a label block, a hairline divider, and an inner track
+ * where tools sit as plain logo + name entries separated by thin rules.
  *
- * Accessibility notes:
- *  - InfiniteSlider renders its children twice to make the loop seamless, so
- *    the moving strip is marked aria-hidden and a single visually-hidden list
- *    carries the real content. Screen readers hear each tool once.
- *  - `durationOnHover` is much slower than the base duration, so hovering
- *    nearly stops the strip to read it.
- *  - Under `prefers-reduced-motion` the slider is not rendered at all — the
- *    tools become a plain static wrapped list.
+ * Motion is pure CSS, like the reference's marquee: the track holds the tools
+ * twice and runs `drift-left` (globals.css) — exactly half its width every
+ * 45s, linear — so the loop is seamless and the browser can animate it without
+ * any JavaScript per frame. Hovering the strip pauses it so a tool can be read.
  *
- * The static list is also what renders on the server. `useReducedMotion` can
- * only know the real preference in the browser, so branching on it during SSR
- * makes the server and client markup disagree and hydration fails. Gating on
- * `mounted` keeps the first client render identical to the server's.
+ * Accessibility:
+ *  - The moving strip is aria-hidden; a single visually-hidden list carries
+ *    the real content, so screen readers hear each tool once.
+ *  - Under `prefers-reduced-motion` the moving strip is not shown and a static
+ *    wrapped list of the tools appears instead (also aria-hidden, since the
+ *    hidden list already names them).
+ *  - No client JavaScript: the same markup renders on the server and client.
  */
 export function ToolsMarquee() {
-  const reduced = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const showStatic = !mounted || reduced;
-
   return (
     <section
       aria-labelledby="tools-heading"
-      className="rounded-[2rem] border border-line bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_72%,#f5e08a_100%)] p-2 shadow-card"
+      className="group rounded-[2rem] border border-line [background:var(--glass-bg-tools)] p-2 shadow-card"
     >
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
         <div className="shrink-0 px-5 py-3 lg:py-2 lg:pr-6">
@@ -53,38 +40,33 @@ export function ToolsMarquee() {
         <span aria-hidden="true" className="hidden h-12 w-px shrink-0 bg-line lg:block" />
 
         <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-2xl border border-line bg-white py-3.5 lg:ml-3">
-          {showStatic ? (
-            /* No motion (or not yet mounted): a plain, fully readable list. */
-            <ul className="flex flex-wrap items-center gap-y-3">
-              {tools.map((tool) => (
-                <li key={tool.name}>
-                  <ToolItem name={tool.name} logo={tool.logo} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <>
-              <InfiniteSlider
-                gap={0}
-                duration={45}
-                durationOnHover={400}
-                className="flex-1 mask-[linear-gradient(to_right,transparent,black_2.5rem,black_calc(100%-2.5rem),transparent)]"
-              >
-                {tools.map((tool) => (
-                  <div key={tool.name} aria-hidden="true">
-                    <ToolItem name={tool.name} logo={tool.logo} />
-                  </div>
-                ))}
-              </InfiniteSlider>
+          {/* Moving strip: CSS only, paused while the strip is hovered. */}
+          <div
+            aria-hidden="true"
+            className="min-w-0 flex-1 overflow-hidden mask-[linear-gradient(to_right,transparent,black_2.5rem,black_calc(100%-2.5rem),transparent)] motion-reduce:hidden"
+          >
+            <div className="flex w-max animate-[drift-left_45s_linear_infinite] group-hover:[animation-play-state:paused]">
+              {[0, 1].map((copy) =>
+                tools.map((tool) => <ToolItem key={`${copy}-${tool.name}`} name={tool.name} logo={tool.logo} />),
+              )}
+            </div>
+          </div>
 
-              {/* The accessible copy of the same content, announced once. */}
-              <ul className="sr-only">
-                {tools.map((tool) => (
-                  <li key={tool.name}>{tool.name}</li>
-                ))}
-              </ul>
-            </>
-          )}
+          {/* Reduced motion: a plain, fully readable list instead. */}
+          <ul aria-hidden="true" className="hidden flex-wrap items-center gap-y-3 motion-reduce:flex">
+            {tools.map((tool) => (
+              <li key={tool.name}>
+                <ToolItem name={tool.name} logo={tool.logo} />
+              </li>
+            ))}
+          </ul>
+
+          {/* The accessible copy of the same content, announced once. */}
+          <ul className="sr-only">
+            {tools.map((tool) => (
+              <li key={tool.name}>{tool.name}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

@@ -31,11 +31,11 @@ export const site = {
   phone: "+63 900 000 0000",
   location: "Philippines · Working with clients worldwide",
   availability: "Available for new projects",
+  // Sidebar social buttons, in this order (the theme toggle sits after them).
   socials: [
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/patrickbernante", icon: "linkedin" },
-    { label: "Facebook", href: "https://www.facebook.com/patrickbernante", icon: "facebook" },
-    { label: "YouTube", href: "https://www.youtube.com/@patrickbernante", icon: "youtube" },
-    { label: "GitHub", href: "https://github.com/patrickbernante", icon: "github" },
+    { label: "Facebook", href: "https://www.facebook.com/patrick.bernante", icon: "facebook" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/patrick-bernante-a608b6374/", icon: "linkedin" },
+    { label: "Telegram", href: "https://t.me/patrickbernante", icon: "telegram" },
   ],
 } as const;
 
@@ -139,6 +139,12 @@ export const aiBuilds: { name: string; icon: "drop" | "chart"; status: "Live" | 
 ];
 
 /**
+ * Sidebar profile photo: a transparent cut-out (background removed), 900x900,
+ * shown like the reference avatar. File in public/about/.
+ */
+export const profilePhoto = asset("/about/patrick-portrait.webp");
+
+/**
  * Photos for the fanned cards in the home About card (files in public/about/,
  * uncropped; CSS frames them with object-position 50% 20%, like the reference). Order is left card, middle card, then
  * the front card on the right, which sits on top. Empty = the three role icons
@@ -192,63 +198,6 @@ export const services = [
     summary:
       "Short-form and long-form edits with clean pacing, captions and motion that hold attention.",
     points: ["Reels, Shorts & TikTok", "YouTube long-form", "Captions & motion graphics"],
-  },
-] as const;
-
-export const projects = [
-  {
-    title: "Lead-to-Booking Agent",
-    category: "AI Automation",
-    icon: "robot",
-    description:
-      "An AI agent that qualifies inbound leads, answers questions from a knowledge base and books straight into the calendar. Cut manual follow-up to near zero.",
-    result: "Response time: 4 hours → under 1 minute",
-    tags: ["Claude API", "GoHighLevel", "n8n"],
-  },
-  {
-    title: "Coaching Funnel System",
-    category: "GoHighLevel",
-    icon: "funnel",
-    description:
-      "A complete funnel and pipeline build for a coaching business — opt-in, nurture sequences, booking and a dashboard the team actually uses.",
-    result: "Booked calls up 3× in one quarter",
-    tags: ["GHL", "Automation", "CRM"],
-  },
-  {
-    title: "Agency Website Rebuild",
-    category: "Web Development",
-    icon: "browser",
-    description:
-      "A slow WordPress site rebuilt in Next.js with proper semantics, image optimisation and structured data. Accessible, fast, and easy to update.",
-    result: "PageSpeed 54 → 98 on mobile",
-    tags: ["Next.js", "SEO", "Accessibility"],
-  },
-  {
-    title: "Short-Form Content Engine",
-    category: "Video Editing",
-    icon: "film",
-    description:
-      "A repeatable edit system for a creator publishing daily — templates, captions and a review flow that keeps output consistent without burning hours.",
-    result: "30 videos/month on a fixed schedule",
-    tags: ["Premiere Pro", "After Effects", "Captions"],
-  },
-  {
-    title: "Client Onboarding Flow",
-    category: "Systems",
-    icon: "plugs",
-    description:
-      "Contract, payment, intake form and kickoff call chained into one automated sequence with no manual handoffs in between.",
-    result: "Onboarding time cut from 3 days to 20 minutes",
-    tags: ["Make", "Stripe", "Webhooks"],
-  },
-  {
-    title: "Support Knowledge Chatbot",
-    category: "AI Automation",
-    icon: "chats",
-    description:
-      "A retrieval chatbot trained on help docs and past tickets, escalating to a human only when it is genuinely stuck.",
-    result: "68% of tickets resolved without a human",
-    tags: ["RAG", "Claude", "Vector DB"],
   },
 ] as const;
 

@@ -58,7 +58,7 @@ export function About() {
         description="I sit between three jobs that used to be separate — automation, web development and video — because most clients need all three to work as one thing."
       />
 
-      <Reveal className="card mt-5 grid grid-cols-1 gap-5 overflow-hidden rounded-[28px] bg-[linear-gradient(100deg,#ffffff_0%,#ffffff_55%,#f5e08a_100%)] px-[clamp(14px,1.4vw,24px)] py-[clamp(14px,2vh,24px)] xl:min-h-[max(30rem,calc(100dvh-13rem))] xl:grid-cols-[minmax(0,1.28fr)_minmax(280px,1fr)] xl:gap-[clamp(16px,2vw,40px)]">
+      <Reveal className="card mt-5 grid grid-cols-1 gap-5 overflow-hidden rounded-[28px] [background:var(--glass-bg)] px-[clamp(14px,1.4vw,24px)] py-[clamp(14px,2vh,24px)] xl:min-h-[max(30rem,calc(100dvh-13rem))] xl:grid-cols-[minmax(0,1.28fr)_minmax(280px,1fr)] xl:gap-[clamp(16px,2vw,40px)]">
         <div className="flex min-w-0 flex-col justify-center gap-[clamp(10px,1.5vh,20px)] xl:py-[clamp(4px,1vh,16px)] xl:pl-[clamp(4px,0.8vw,16px)]">
           <div className="flex max-w-[58ch] flex-col gap-4 text-[length:clamp(12.5px,min(0.92vw,1.7vh),15.5px)] leading-[1.6] text-ink-muted">
             <p>

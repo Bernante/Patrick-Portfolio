@@ -4,8 +4,8 @@ import { aboutPhotos, aiBuilds, projectShots, services, testimonials } from "@/l
 import { Icon, type IconName } from "../Icon";
 import { Reveal } from "../Reveal";
 
-/** Icon-tile colour: Clay Brown, the theme primary. */
-const ACCENT = "#6b352a";
+/** Icon-tile colour: the theme primary (clay brown; lightens in dark mode). */
+const ACCENT = "var(--color-blueberry)";
 
 /**
  * About card fan, copied from the reference's CSS: 3:4 cards
@@ -40,7 +40,7 @@ export function HomeBento() {
     <Reveal delay={0.24} className="mt-6 block fit:mt-[clamp(12px,1.9vh,18px)] fit:min-h-0">
       <section
         aria-label="Overview"
-        className="rounded-[2rem] border border-line bg-[linear-gradient(100deg,#ffffff_0%,#ffffff_62%,#f5e08a_100%)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_24px_60px_-36px_rgba(58,28,22,0.4)] sm:p-4 md:p-5 fit:h-full fit:px-[clamp(14px,1.4vw,24px)] fit:py-[clamp(14px,2vh,24px)]"
+        className="rounded-[2rem] border border-line [background:var(--glass-bg)] p-3 [box-shadow:var(--glass-shadow)] sm:p-4 md:p-5 fit:h-full fit:px-[clamp(14px,1.4vw,24px)] fit:py-[clamp(14px,2vh,24px)]"
       >
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 3xl:auto-rows-fr 3xl:grid-cols-4 fit:h-full fit:grid-cols-4 fit:grid-rows-2 fit:gap-[clamp(10px,1vw,16px)]">
           <BentoCard
@@ -60,7 +60,7 @@ export function HomeBento() {
                   <span
                     key={i}
                     aria-hidden="true"
-                    className={`col-start-1 row-start-1 flex aspect-[3/4] w-28 items-center justify-center overflow-hidden rounded-[12px] bg-[#f4f4ed] shadow-[0_0_0_3px_#fff,0_14px_30px_-14px_rgba(6,12,26,0.6)] transition-transform duration-[520ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] fit:w-[clamp(72px,5.6vw,96px)] ${fan}`}
+                    className={`col-start-1 row-start-1 flex aspect-[3/4] w-28 items-center justify-center overflow-hidden rounded-[12px] bg-[var(--plate)] shadow-[0_0_0_3px_var(--plate-ring),0_14px_30px_-14px_rgba(6,12,26,0.6)] transition-transform duration-[520ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] fit:w-[clamp(72px,5.6vw,96px)] ${fan}`}
                     style={{ zIndex: i + 1 }}
                   >
                     {photo ? (

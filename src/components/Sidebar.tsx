@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { nav, site } from "@/lib/site";
+import { nav, profilePhoto, site } from "@/lib/site";
 import { CustomCursorTarget } from "@/components/ui/custom-cursor";
 import { Icon, type IconName } from "./Icon";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -119,6 +120,13 @@ export function Sidebar() {
                 </CustomCursorTarget>
               </li>
             ))}
+            {/* Light / dark toggle, after the socials like the reference. A
+                solid background so the moon's cut-out matches the button. */}
+            <li>
+              <CustomCursorTarget className="size-auto hover:opacity-100">
+                <ThemeToggle className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-white text-blueberry transition hover:-translate-y-px hover:border-line-strong lg:h-[44px] lg:w-[44px]" />
+              </CustomCursorTarget>
+            </li>
           </ul>
         </div>
 
@@ -138,8 +146,8 @@ export function Sidebar() {
                     aria-current={active ? "page" : undefined}
                     className={`flex min-h-[3.25rem] items-center gap-3.5 rounded-2xl px-4 text-[16.5px] tracking-[-0.006em] transition lg:min-h-[clamp(42px,5.4vh,48px)] lg:gap-[13px] lg:rounded-[10px] ${
                       active
-                        ? "bg-[rgba(58,28,22,0.09)] font-semibold text-ink"
-                        : "font-medium text-ink/80 hover:bg-[rgba(58,28,22,0.05)] hover:text-ink"
+                        ? "bg-[var(--tint-strong)] font-semibold text-ink"
+                        : "font-medium text-ink/80 hover:bg-[var(--tint)] hover:text-ink"
                     }`}
                   >
                     <Icon
@@ -170,18 +178,32 @@ export function Sidebar() {
   );
 }
 
+/**
+ * Profile photo, copied from the reference avatar (rail__avatar):
+ *  - lg: a transparent cut-out in a square clamp(132px, 21vh, 190px) box,
+ *    contained and resting on the bottom edge, with a soft drop shadow, an oval
+ *    mask that fades the edges, and a blurred glow behind it (clay brown here,
+ *    orange on the reference). The alt text names the home link it sits in.
+ *  - sm (phone top bar): the same photo in a small round crop; the link next to
+ *    it already shows the name, so the image is decorative there.
+ */
 function Avatar({ size }: { size: "sm" | "lg" }) {
-  // Desktop size copied from the reference avatar: clamp(132px, 21vh, 190px).
-  const dim =
-    size === "lg"
-      ? "h-28 w-28 text-4xl lg:h-[clamp(132px,21vh,190px)] lg:w-[clamp(132px,21vh,190px)] lg:text-[length:clamp(44px,7vh,62px)]"
-      : "h-10 w-10 text-base";
+  if (size === "sm") {
+    return (
+      <span className="block h-10 w-10 overflow-hidden rounded-full bg-cream ring-2 ring-cream">
+        <img src={profilePhoto} alt="" width={40} height={40} className="h-full w-full object-cover object-top" />
+      </span>
+    );
+  }
   return (
-    <span
-      className={`${dim} flex items-center justify-center rounded-full bg-blueberry font-bold tracking-tight text-cream ring-4 ring-cream`}
-      aria-hidden="true"
-    >
-      PB
+    <span className="relative block h-28 w-28 before:pointer-events-none before:absolute before:inset-[18%_4%_0] before:rounded-full before:bg-[radial-gradient(ellipse_at_50%_70%,rgba(107,53,42,0.32),transparent_66%)] before:blur-[22px] before:content-[''] lg:h-[clamp(132px,21vh,190px)] lg:w-[clamp(132px,21vh,190px)]">
+      <img
+        src={profilePhoto}
+        alt={site.name}
+        width={900}
+        height={900}
+        className="relative block h-full w-full object-contain object-bottom drop-shadow-[0_14px_22px_rgba(6,12,26,0.35)] mask-[radial-gradient(ellipse_80%_86%_at_50%_24%,black_50%,transparent_100%)]"
+      />
     </span>
   );
 }

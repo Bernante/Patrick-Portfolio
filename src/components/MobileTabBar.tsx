@@ -40,7 +40,7 @@ export function MobileTabBar() {
           href={tab.href}
           aria-current={active ? "page" : undefined}
           className={`flex min-h-[3.75rem] flex-col items-center justify-center gap-1 rounded-full text-[0.75rem] font-semibold transition ${
-            active ? "bg-white/10" : "text-cream/75 hover:text-cream"
+            active ? "bg-[rgba(255,255,255,0.1)]" : "text-[#fff1a6]/75 hover:text-[#fff1a6]"
           }`}
           style={active ? { color: ACCENT } : undefined}
         >
@@ -56,15 +56,15 @@ export function MobileTabBar() {
       aria-label="Mobile"
       className="no-print fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-30 lg:hidden [@media(max-height:500px)]:hidden"
     >
-      <ul className="grid grid-cols-5 items-center rounded-full bg-blueberry-900 p-1.5 shadow-[0_18px_40px_-12px_rgba(58,28,22,0.6)] ring-1 ring-white/10">
+      <ul className="grid grid-cols-5 items-center rounded-full bg-[#3a1c16] p-1.5 shadow-[0_18px_40px_-12px_rgba(58,28,22,0.6)] ring-1 ring-[rgba(255,255,255,0.1)]">
         {tabs.slice(0, 2).map(renderTab)}
 
         <li className="flex justify-center">
           <Link
             href="/contact"
             aria-current={contactActive ? "page" : undefined}
-            className={`-mt-9 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full text-blueberry-900 shadow-[0_10px_28px_-6px_rgba(255,241,166,0.55)] transition active:scale-95 ${
-              contactActive ? "ring-4 ring-cream" : ""
+            className={`-mt-9 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full text-[#3a1c16] shadow-[0_10px_28px_-6px_rgba(255,241,166,0.55)] transition active:scale-95 ${
+              contactActive ? "ring-4 ring-[#fff1a6]" : ""
             }`}
             style={{ backgroundColor: ACCENT }}
           >

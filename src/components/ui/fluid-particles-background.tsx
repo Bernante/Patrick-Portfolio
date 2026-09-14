@@ -24,6 +24,12 @@ interface CyberBackgroundProps {
    * so a phone screen is not several times denser than a desktop one.
    */
   density?: number;
+  /**
+   * Caps how often the canvas is redrawn. Movement, particle life and trail
+   * fade are scaled by the real time between draws, so a capped background
+   * looks the same as a 60fps one, just costs less.
+   */
+  maxFps?: number;
 }
 
 // Helper function for Perlin Noise
@@ -111,6 +117,18 @@ function createNoise() {
   };
 }
 
+/**
+ * Scales an rgba() fill's alpha for a draw that stands in for `scale` 60fps
+ * frames, so trails fade at the same speed at any frame rate.
+ */
+function scaleAlpha(color: string, scale: number) {
+  if (scale === 1) return color;
+  const m = color.match(/^rgba\(\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([\d.]+)\s*\)$/);
+  if (!m) return color;
+  const alpha = 1 - Math.pow(1 - Number(m[4]), scale);
+  return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${alpha.toFixed(4)})`;
+}
+
 const COLOR_SCHEME = {
   light: {
     particle: {
@@ -161,6 +179,7 @@ export const FluidParticlesBackground = ({
   particleRgb,
   trailColor,
   density,
+  maxFps,
 }: CyberBackgroundProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sizeMin = particleSize.min;
@@ -214,7 +233,8 @@ export const FluidParticlesBackground = ({
       for (const particle of particles) drawParticle(particle, rgb);
     };
 
-    const step = () => {
+    // `scale` = how many 60fps frames this draw stands in for.
+    const step = (scale: number) => {
       // Check for dark mode to apply theme-appropriate colors
       const isDark = document.documentElement.classList.contains("dark");
       const scheme = isDark ? COLOR_SCHEME.dark : COLOR_SCHEME.light;
@@ -222,11 +242,11 @@ export const FluidParticlesBackground = ({
       const z = Date.now() * 0.0001;
 
       // Clear canvas with a semi-transparent background to create trails
-      ctx.fillStyle = trailColor ?? scheme.background;
+      ctx.fillStyle = scaleAlpha(trailColor ?? scheme.background, scale);
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (const particle of particles) {
-        particle.life += 1;
+        particle.life += scale;
         if (particle.life > particle.maxLife) {
           particle.life = 0;
           particle.x = Math.random() * canvas.width;
@@ -237,8 +257,8 @@ export const FluidParticlesBackground = ({
         const n = noise.simplex3(particle.x * noiseIntensity, particle.y * noiseIntensity, z);
 
         const angle = n * Math.PI * 4;
-        particle.velocity.x = Math.cos(angle) * 2;
-        particle.velocity.y = Math.sin(angle) * 2;
+        particle.velocity.x = Math.cos(angle) * 2 * scale;
+        particle.velocity.y = Math.sin(angle) * 2 * scale;
 
         particle.x += particle.velocity.x;
         particle.y += particle.velocity.y;
@@ -257,9 +277,21 @@ export const FluidParticlesBackground = ({
     if (reducedMotion) {
       drawStatic();
     } else {
-      const animate = () => {
-        step();
+      // Optional frame-rate cap (`maxFps`); each draw is scaled by the real
+      // time since the last one (capped at 3 frames' worth after a stall).
+      // Nothing is drawn while the tab is hidden.
+      const minFrameMs = maxFps ? 1000 / maxFps : 0;
+      let last = performance.now();
+      const animate = (now: number) => {
         rafId = requestAnimationFrame(animate);
+        if (document.hidden) {
+          last = now;
+          return;
+        }
+        const elapsed = now - last;
+        if (elapsed < minFrameMs - 2) return;
+        last = now;
+        step(Math.min(elapsed / (1000 / 60), 3));
       };
       rafId = requestAnimationFrame(animate);
     }
@@ -280,7 +312,7 @@ export const FluidParticlesBackground = ({
       cancelAnimationFrame(rafId);
       observer.disconnect();
     };
-  }, [particleCount, noiseIntensity, sizeMin, sizeMax, particleRgb, trailColor, density]);
+  }, [particleCount, noiseIntensity, sizeMin, sizeMax, particleRgb, trailColor, density, maxFps]);
 
   return (
     <div

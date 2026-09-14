@@ -79,6 +79,179 @@
 }
 
 /* ==========================================================================
+   Light / dark theme — modelled on the reference (portfolio.brewedops.cloud)
+   The theme lives on <html data-theme="light|dark">. An inline script in
+   layout.tsx sets it before first paint from localStorage "pb-theme": only an
+   explicit saved "dark" gives dark; anything else (first visit, blocked
+   storage) is light. Like the reference, the system dark setting is not used,
+   so every first visit sees the light design. Dark mode flips the colour
+   tokens, so every utility built on them follows automatically.
+   ========================================================================== */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  /* Theme-dependent surfaces that are more than a single colour token. */
+  --glass-bg: linear-gradient(100deg, #ffffff 0%, #ffffff 62%, #f5e08a 100%);
+  --glass-bg-tools: linear-gradient(90deg, #ffffff 0%, #ffffff 72%, #f5e08a 100%);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 24px 60px -36px rgba(58, 28, 22, 0.4);
+  --plate: #f4f4ed;
+  --plate-ring: #ffffff;
+  --tint: rgba(58, 28, 22, 0.05);
+  --tint-strong: rgba(58, 28, 22, 0.09);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Espresso page, cards a step lighter, warm off-white text, butter lines. */
+  --color-page: #120b09;
+  --color-surface: #1a110e;
+  --color-surface-2: #211612;
+  --color-white: #241814;
+  --color-ink: #f6ecd9;
+  --color-ink-soft: #f1c7a5;
+  --color-ink-muted: #c9b8a4;
+  --color-line: rgba(255, 241, 166, 0.12);
+  --color-line-strong: rgba(255, 241, 166, 0.24);
+
+  /* Brand pair swaps roles (as the reference's navy/cream do): the clay accent
+     lightens so it reads on dark, and butter becomes the dark tint, so
+     "brown fill + cream text" becomes "light clay fill + dark text". */
+  --color-blueberry: #e3a47f;
+  --color-blueberry-700: #f0bb98;
+  --color-blueberry-900: #fff1a6;
+  --color-blueberry-300: #8a5a4a;
+  --color-cream: #2b1d17;
+  --color-cream-soft: #261a15;
+  --color-cream-deep: #3a2a1f;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.45), 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+
+  --color-background: #120b09;
+  --color-foreground: #f6ecd9;
+  --color-card: #241814;
+  --color-card-foreground: #f6ecd9;
+  --color-popover: #241814;
+  --color-popover-foreground: #f6ecd9;
+  --color-primary: #e3a47f;
+  --color-primary-foreground: #120b09;
+  --color-secondary: #261a15;
+  --color-secondary-foreground: #f6ecd9;
+  --color-muted: #261a15;
+  --color-muted-foreground: #c9b8a4;
+  --color-accent: #2b1d17;
+  --color-accent-foreground: #f6ecd9;
+  --color-border: rgba(255, 241, 166, 0.12);
+  --color-input: rgba(255, 241, 166, 0.24);
+  --color-ring: #e3a47f;
+
+  --glass-bg: linear-gradient(100deg, #1a110e 0%, #1a110e 62%, #3b2a18 100%);
+  --glass-bg-tools: linear-gradient(90deg, #1a110e 0%, #1a110e 72%, #3b2a18 100%);
+  --glass-shadow: inset 0 1px 0 rgba(255, 241, 166, 0.06), 0 24px 60px -36px rgba(0, 0, 0, 0.8);
+  --plate: #2b1f19;
+  --plate-ring: #3a2a22;
+  --tint: rgba(255, 241, 166, 0.05);
+  --tint-strong: rgba(255, 241, 166, 0.09);
+}
+
+/* Adaptive performance tiers (src/lib/perf-tier.ts): on "mid" and "low",
+   backdrop blur is switched off everywhere, as on the reference — it is one of
+   the most expensive effects to repaint. ("low" also removes the particle
+   background, in ParticlesBackdrop.tsx.) */
+:root[data-perf="mid"] *,
+:root[data-perf="low"] *,
+:root[data-perf="mid"] *::before,
+:root[data-perf="low"] *::before,
+:root[data-perf="mid"] *::after,
+:root[data-perf="low"] *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Theme switch animation (reference: theme-sweep). ThemeToggle.tsx sets
+   --sweep-x/--sweep-y to the button centre and --sweep-r to the distance to
+   the farthest corner, then runs a View Transition: the new theme is revealed
+   as a circle growing from the button over 1.2s. The old view stays still.
+   Without View Transitions support, or with reduced motion, it switches
+   instantly. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-theme-sweep]::view-transition-new(root) {
+  animation: theme-sweep 1.2s cubic-bezier(0.55, 0, 0.15, 1) both;
+}
+
+@keyframes theme-sweep {
+  from {
+    clip-path: circle(0px at var(--sweep-x, 50%) var(--sweep-y, 50%));
+  }
+  to {
+    clip-path: circle(var(--sweep-r, 150vmax) at var(--sweep-x, 50%) var(--sweep-y, 50%));
+  }
+}
+
+/* Sun/moon toggle icon (reference .tg): in light mode a moon (disc with a
+   cut-out); in dark mode the icon turns 90deg, the cut slides away, the disc
+   shrinks and the rays spin in, leaving a sun. */
+.tg {
+  display: block;
+  overflow: hidden;
+  transform: rotate(0);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tg__cut,
+.tg__disc,
+.tg__rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.tg__cut {
+  fill: var(--tg-bg, var(--color-white));
+  transform: translate(4.5px, -4.5px);
+}
+
+.tg__rays {
+  opacity: 0;
+  transform: rotate(-60deg) scale(0.55);
+}
+
+.tg[data-theme="dark"] {
+  transform: rotate(90deg);
+}
+
+.tg[data-theme="dark"] .tg__cut {
+  transform: translate(16px, -16px);
+}
+
+.tg[data-theme="dark"] .tg__disc {
+  transform: scale(0.66);
+}
+
+.tg[data-theme="dark"] .tg__rays {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg,
+  .tg__cut,
+  .tg__disc,
+  .tg__rays {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
    Base — accessibility-first sizing
    ========================================================================== */
 

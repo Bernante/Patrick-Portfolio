@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import { JsonLd } from "@/components/JsonLd";
 import { MobileTabBar } from "@/components/MobileTabBar";
 import { ParticlesBackdrop } from "@/components/ParticlesBackdrop";
+import { PerfTier } from "@/components/PerfTier";
 import { Sidebar } from "@/components/Sidebar";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { asset, pages, site } from "@/lib/site";
@@ -102,14 +103,17 @@ export default function RootLayout({
   // <html> before React hydrates, so server and client markup differ there by
   // design. It is scoped to that one element.
   return (
-    <html lang="en" className={poppins.variable} suppressHydrationWarning>
+    <html lang="en" data-theme="light" className={poppins.variable} suppressHydrationWarning>
       <head>
         {/* Runs before first paint: flags that JS is alive so the scroll-reveal
             CSS may hide content. Without this flag the page renders fully
             visible — no blank screen if scripts are blocked or slow. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.add('js')`,
+            // Also sets the theme before first paint (no light flash for a
+            // saved dark choice). Only a saved "dark" gives dark; a first visit
+            // or blocked storage is light, like the reference.
+            __html: `document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('pb-theme')==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}try{var p=sessionStorage.getItem('pb-perf-tier');if(p==='mid'||p==='low')document.documentElement.dataset.perf=p}catch(e){}`,
           }}
         />
       </head>
@@ -131,6 +135,8 @@ export default function RootLayout({
         <CustomCursor className="select-text" color="#ff4c24">
           {/* Particle background, desktop only (see ParticlesBackdrop.tsx). */}
           <ParticlesBackdrop />
+          {/* Adaptive performance check: lightens effects on slow devices. */}
+          <PerfTier />
 
           {/* The shell lives in the layout so the sidebar keeps its state and
               does not re-mount or re-animate when you move between routes. */}
