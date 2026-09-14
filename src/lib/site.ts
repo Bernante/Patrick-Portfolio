@@ -44,8 +44,8 @@ export const nav = [
   { href: "/", label: "Home", icon: "house" },
   { href: "/projects", label: "Projects", icon: "folder" },
   { href: "/services", label: "Services", icon: "stack" },
-  { href: "/about", label: "About", icon: "user" },
   { href: "/testimonials", label: "Testimonials", icon: "star" },
+  { href: "/about", label: "About", icon: "user" },
   { href: "/contact", label: "Contact", icon: "chat" },
 ] as const;
 
@@ -210,33 +210,6 @@ export const homeFacts = [
   { value: String(services.length), label: "Services" },
   { value: "GMT+8", label: "PH time" },
   { value: "1 day", label: "Reply time" },
-] as const;
-
-export const process = [
-  {
-    step: "01",
-    title: "Discovery",
-    icon: "magnifyingglass",
-    text: "We map what you do by hand today and find where the time actually goes.",
-  },
-  {
-    step: "02",
-    title: "Blueprint",
-    icon: "blueprint",
-    text: "You get a plain-language plan: what gets built, in what order, and what it costs.",
-  },
-  {
-    step: "03",
-    title: "Build",
-    icon: "wrench",
-    text: "I build in short cycles so you see working pieces early, not a surprise at the end.",
-  },
-  {
-    step: "04",
-    title: "Handover",
-    icon: "graduationcap",
-    text: "Docs, a walkthrough video and support — so your team can run it without me.",
-  },
 ] as const;
 
 export const faqs = [

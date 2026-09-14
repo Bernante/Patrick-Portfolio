@@ -436,6 +436,121 @@ html {
 }
 
 /* ==========================================================================
+   Services page (see Services.tsx and AutomationFlow.tsx), from the reference
+   ========================================================================== */
+
+:root {
+  /* Automation window. */
+  --flow-titlebar: linear-gradient(#f5f5f2, #ecEae5);
+  --flow-canvas: #faf7ef;
+  --flow-grid: rgba(58, 28, 22, 0.05);
+  --flow-grid-strong: rgba(58, 28, 22, 0.13);
+  --flow-cable: #d8d2c2;
+  --flow-port: #c4bca9;
+  --flow-loop: #6b352a;
+  --flow-node-bg: linear-gradient(158deg, #ffffff, #fbf9f1);
+  --flow-node-border: rgba(58, 28, 22, 0.12);
+}
+
+:root[data-theme="dark"] {
+  --flow-titlebar: linear-gradient(#211612, #1a110e);
+  --flow-canvas: #140d0b;
+  --flow-grid: rgba(255, 241, 166, 0.06);
+  --flow-grid-strong: rgba(255, 241, 166, 0.16);
+  --flow-cable: rgba(246, 236, 217, 0.22);
+  --flow-port: rgba(246, 236, 217, 0.35);
+  --flow-loop: #e3a47f;
+  --flow-node-bg: linear-gradient(158deg, #2a1c17, #211612);
+  --flow-node-border: rgba(255, 241, 166, 0.24);
+}
+
+/* Stage icon: hops up 2px and grows to 106%, then rests (2.4s loop, staggered). */
+@keyframes svc-lit {
+  0%,
+  100% {
+    transform: none;
+  }
+  10% {
+    transform: translateY(-2px) scale(1.06);
+  }
+  40% {
+    transform: none;
+  }
+}
+
+/* Dot on the dashed connector between stages: fades in, slides 24px, fades out. */
+@keyframes svc-hop {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateX(24px);
+    opacity: 1;
+  }
+  60%,
+  100% {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+/* Workflow canvas: cream with a two-size dotted grid. */
+.flow-canvas {
+  background-color: var(--flow-canvas);
+  background-image:
+    radial-gradient(circle, var(--flow-grid-strong) 1.3px, transparent 1.6px),
+    radial-gradient(circle, var(--flow-grid) 1.3px, transparent 1.6px);
+  background-size:
+    110px 110px,
+    22px 22px;
+}
+
+/* Glowing signal dot that travels along a cable (its offset-path is set inline). */
+.flow-signal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-blueberry);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-blueberry) 18%, transparent),
+    0 0 10px color-mix(in srgb, var(--color-blueberry) 70%, transparent);
+  offset-rotate: 0deg;
+  animation: flow-signal 2.6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes flow-signal {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  10%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-signal {
+    display: none;
+  }
+}
+
+:root[data-perf="low"] .flow-signal {
+  display: none;
+}
+
+/* ==========================================================================
    Scroll reveal — progressive enhancement
    Content is visible by default. Only once JS has run (html.js) is it hidden
    ready to animate, so a blocked or slow script can never blank the page.
