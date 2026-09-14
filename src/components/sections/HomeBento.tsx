@@ -125,31 +125,8 @@ export function HomeBento() {
             title="Testimonials"
             href="/testimonials"
             description="What the people I build for say about the work."
-            aside={
-              testimonials.length ? (
-                <ul className="flex flex-col gap-2">
-                  {testimonials.map((t) => (
-                    <li
-                      key={t.name}
-                      className="rounded-xl border border-line bg-white p-3 shadow-card fit:p-2.5"
-                    >
-                      <p className="font-semibold text-ink fit:text-[0.8rem]">{t.name}</p>
-                      <p className="text-[0.9rem] text-ink-muted fit:text-[0.72rem]">{t.role}</p>
-                      <p className="mt-1 text-[0.9rem] text-ink fit:text-[0.72rem]">
-                        &ldquo;{t.quote}&rdquo;
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="rounded-xl border border-dashed border-line-strong bg-white p-4 fit:p-3">
-                  <p className="font-semibold text-ink fit:text-[0.8rem]">Testimonials coming soon</p>
-                  <p className="mt-1 text-[0.95rem] leading-snug text-ink-muted fit:text-[0.72rem]">
-                    Real words from real clients will appear here.
-                  </p>
-                </div>
-              )
-            }
+            wideAside
+            aside={<TestimonialReel />}
           />
         </ul>
       </section>
@@ -169,6 +146,7 @@ function BentoCard({
   href,
   className = "",
   aside,
+  wideAside = false,
   children,
 }: {
   icon: IconName;
@@ -177,8 +155,13 @@ function BentoCard({
   href: string;
   className?: string;
   aside?: ReactNode;
+  /** Give the aside 1.25 parts to the text's 1, like the reference's Testimonials card. */
+  wideAside?: boolean;
   children?: ReactNode;
 }) {
+  const asideCols = wideAside
+    ? "sm:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] fit:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]"
+    : "sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2";
   const header = (
     <>
       {/* z-10 (a flex-item stacking context, no `position`) keeps the header
@@ -211,7 +194,7 @@ function BentoCard({
       className={`group card card-hover relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[22px] bg-surface p-6 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-blueberry fit:px-[clamp(12px,1.1vw,18px)] fit:py-[clamp(12px,1.4vh,18px)] ${className}`}
     >
       {aside ? (
-        <div className="grid h-full min-h-0 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 fit:gap-3">
+        <div className={`grid h-full min-h-0 gap-4 fit:gap-x-[14px] fit:gap-y-3 ${asideCols}`}>
           <div className="min-w-0">{header}</div>
           {/* pointer-events-none: the aside (the screenshot reel, quotes) is
               drawn above the stretched title link, so without this, clicks on
@@ -279,6 +262,75 @@ function ChipRows() {
         {aiBuilds.map((build) => (
           <li key={build.name}>
             {build.name} ({build.status})
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/** Cards per loop half; enough to overfill the tallest Testimonials card. */
+const REVIEW_REPEAT = 4;
+
+/**
+ * Upward-drifting column for the Testimonials card, copied from the reference
+ * (bento__reviews):
+ *  - White cards with 12px corners, a 1px inset outline, 10px 12px padding and
+ *    4px between lines; top line is an 18px tile (5px corners) plus the title
+ *    in 12px bold, then 11.5px muted text (and the quote, once there are real
+ *    testimonials).
+ *  - The column holds its cards twice and moves up exactly half its height every
+ *    20s, linear, so the loop is seamless. Spacing is 10px bottom padding, not
+ *    `gap`, so the two halves are exactly equal.
+ *  - Paused until the card is hovered or keyboard-focused; pauses in place when
+ *    the pointer leaves. Top and bottom 12% fade out.
+ *  - With no testimonials yet, the "coming soon" card repeats to fill the loop.
+ *  - The moving column is aria-hidden; screen readers get the content once from
+ *    a visually hidden copy. Reduced motion is honoured by the rule in globals.css.
+ *  - 190px tall outside the one-screen layout, like the reference on tablets.
+ */
+function TestimonialReel() {
+  const items = testimonials.length
+    ? testimonials.map((t) => ({ title: t.name, text: t.role, quote: t.quote }))
+    : [{ title: "Testimonials coming soon", text: "Real words from real clients will appear here.", quote: "" }];
+  const set = Array.from(
+    { length: Math.ceil(REVIEW_REPEAT / items.length) * items.length },
+    (_, i) => items[i % items.length],
+  );
+
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        className="h-[190px] overflow-hidden mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] fit:h-full"
+      >
+        <div className="animate-[reel-up_20s_linear_infinite] [animation-play-state:paused] group-focus-within:[animation-play-state:running] group-hover:[animation-play-state:running]">
+          {[0, 1].map((copy) =>
+            set.map((item, i) => (
+              <div key={`${copy}-${i}`} className="pb-[10px]">
+                <div className="flex flex-col gap-[4px] rounded-[12px] bg-white px-[12px] py-[10px] shadow-[inset_0_0_0_1px_var(--color-line)]">
+                  <span className="flex items-center gap-[7px] text-[12px] leading-[18px] text-ink">
+                    <span className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-cream-soft text-blueberry">
+                      <Icon name="star" size={12} weight="fill" />
+                    </span>
+                    <b className="min-w-0 truncate font-bold">{item.title}</b>
+                  </span>
+                  <span className="text-[11.5px] leading-[1.4] text-ink-muted">{item.text}</span>
+                  {item.quote && (
+                    <span className="line-clamp-2 text-[11px] leading-[1.4] font-semibold tracking-[0.01em] text-blueberry">
+                      &ldquo;{item.quote}&rdquo;
+                    </span>
+                  )}
+                </div>
+              </div>
+            )),
+          )}
+        </div>
+      </div>
+      <ul className="sr-only">
+        {items.map((item) => (
+          <li key={item.title}>
+            {item.title}. {item.text} {item.quote}
           </li>
         ))}
       </ul>
