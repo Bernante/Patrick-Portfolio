@@ -38,7 +38,9 @@ function applyTheme(theme: Theme) {
 function switchTheme(theme: Theme, origin?: { x: number; y: number }) {
   const doc = document as ViewTransitionDocument;
   const root = document.documentElement;
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // The site's own "Reduce motion" switch (A11yWidget) also skips the sweep.
+  const reducedMotion =
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches || root.dataset.a11yMotion === "true";
 
   if (!doc.startViewTransition || reducedMotion || currentTheme() === theme) {
     applyTheme(theme);

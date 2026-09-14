@@ -24,7 +24,8 @@ const TIER_SETTINGS = {
  * On phones and small tablets it is not mounted at all (not just hidden), so
  * no canvas, particle array or animation loop runs there. Hiding it with CSS
  * would still burn CPU every frame. It is also removed entirely when the
- * adaptive performance check drops the site to the "low" tier.
+ * adaptive performance check drops the site to the "low" tier, and while the
+ * accessibility widget's "Reduce motion" switch is on (`a11ychange` event).
  *
  * Renders nothing on the server and on the first client render, then mounts
  * once the media query confirms a desktop-width screen, so server and client
@@ -41,6 +42,7 @@ export function ParticlesBackdrop() {
   const [isDesktop, setIsDesktop] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [tier, setTier] = useState<PerfTier>("high");
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
     const query = window.matchMedia(DESKTOP);
@@ -56,14 +58,19 @@ export function ParticlesBackdrop() {
     readTier();
     window.addEventListener(PERF_TIER_EVENT, readTier);
 
+    const readMotion = () => setReduceMotion(document.documentElement.dataset.a11yMotion === "true");
+    readMotion();
+    window.addEventListener("a11ychange", readMotion);
+
     return () => {
       query.removeEventListener("change", update);
       window.removeEventListener("themechange", readTheme);
       window.removeEventListener(PERF_TIER_EVENT, readTier);
+      window.removeEventListener("a11ychange", readMotion);
     };
   }, []);
 
-  if (!isDesktop || tier === "low") return null;
+  if (!isDesktop || tier === "low" || reduceMotion) return null;
 
   const { density, maxFps } = TIER_SETTINGS[tier];
 

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <>
-      <BreadcrumbJsonLd label="Contact" href="/contact" />
+      <BreadcrumbJsonLd label="FAQs / Contact" href="/contact" />
       <FaqJsonLd />
       <Contact />
     </>

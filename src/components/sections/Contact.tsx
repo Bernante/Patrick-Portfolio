@@ -1,158 +1,207 @@
+"use client";
+
+import { useState } from "react";
 import { faqs, site } from "@/lib/site";
-import { ContactForm } from "../ContactForm";
 import { Icon, type IconName } from "../Icon";
 import { Reveal } from "../Reveal";
-import { SectionHeading } from "../SectionHeading";
+
+/**
+ * FAQs / Contact page, rebuilt on the reference (portfolio.brewedops.cloud/
+ * contact), a single screen:
+ *  - Header: eyebrow "FAQs / Contact", title, lede.
+ *  - Glass panel. Desktop (1100px+): two columns, 0.8fr / 1.35fr, filling the
+ *    screen height. The FAQ column never drops below clamp(280px, 60vw − 360px,
+ *    440px), so from 1280px the full email pill and the three reference-size
+ *    (36px) social buttons share one row; narrower, the buttons move under it.
+ *    Left, a dark FAQ card: eyebrow, two-tone title, a numbered accordion (one
+ *    answer open at a time, the first open to start; the list scrolls if it
+ *    outgrows the card) and, pinned to the bottom, the email pill plus round
+ *    Facebook, LinkedIn and Telegram buttons (Telegram where the reference has
+ *    Discord).
+ *    Right, the form card: first/last name, email, a message box that grows to
+ *    fill, and the send button with a one-line note.
+ *  - Below 1100px the form comes first and the FAQ card follows; under 560px
+ *    the name fields and the contact row stack.
+ *  - Like the reference, the form is not live yet: the button reads "Work in
+ *    Progress" and is disabled. It gets a hidden honeypot field for when it is
+ *    connected.
+ * Contact links are only the owner's real socials (site.socials).
+ */
+
+
+/** Desktop panel height: the screen minus the reference page's spacing and the header. */
+const PANEL_H =
+  "lg:h-[max(500px,calc(100dvh-clamp(28px,5vh,64px)-34px-clamp(30px,3.1vw,60px)*1.06-clamp(14px,1vw,19px)*1.6-clamp(16px,2.6vh,34px)-clamp(16px,3vh,32px)))]";
+
+const LABEL =
+  "text-[length:clamp(11px,0.72vw,12.5px)] font-bold tracking-[0.06em] text-ink-muted uppercase max-sm:text-[12px]";
+const INPUT =
+  "w-full min-w-0 rounded-[12px] border border-line-strong bg-white px-[14px] py-[clamp(10px,1.4vh,13px)] text-[length:clamp(13.5px,0.95vw,15.5px)] leading-[1.45] text-ink shadow-[inset_0_1px_2px_rgba(6,12,26,0.04)] transition-[border-color,box-shadow] duration-[180ms] placeholder:text-ink-muted placeholder:opacity-70 focus:border-[#ff7a1a] focus:shadow-[0_0_0_3px_rgba(255,122,26,0.18)] focus:outline-none max-lg:text-[16px]";
 
 export function Contact() {
-  const channels = [
-    { icon: "email", label: "Email", value: site.email, href: `mailto:${site.email}` },
-    { icon: "phone", label: "Phone", value: site.phone, href: `tel:${site.phone.replace(/\s/g, "")}` },
-    { icon: "pin", label: "Location", value: site.location, href: null },
-  ] as const;
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="contact" aria-labelledby="contact-heading" className="scroll-mt-8">
-      <SectionHeading
-        id="contact-heading"
-        icon="chat"
-        eyebrow="Get in touch"
-        title="Tell me what you want to stop doing by hand"
-        description="Send a short note about the project. I read every message myself and reply within one business day."
-      />
+    <section
+      id="contact"
+      aria-labelledby="contact-heading"
+      className="scroll-mt-8 lg:mx-[calc(min(4vw,64px)-56px)] lg:mt-[calc(clamp(28px,5vh,64px)-3rem)] lg:mb-[calc(clamp(16px,3vh,32px)-3rem)]"
+    >
+      <header className="flex flex-col gap-[8px] max-lg:pr-[56px]">
+        <p className="text-[12px] font-semibold tracking-[0.08em] text-blueberry uppercase">FAQs / Contact</p>
+        <h1
+          id="contact-heading"
+          className="text-[length:clamp(30px,3.1vw,60px)] leading-[1.06] font-bold tracking-[-0.028em] text-ink max-lg:leading-[1.08] max-lg:tracking-[-0.022em]"
+        >
+          Useful systems. Simple solutions.
+        </h1>
+        <p className="text-[length:clamp(14px,1vw,19px)] leading-[1.6] text-ink-muted max-lg:leading-[1.5] max-lg:font-medium sm:max-lg:max-w-[60ch]">
+          Tell me which repetitive process is slowing you down, and I will reply with how it could be simplified.
+        </p>
+      </header>
 
-      <div className="mt-10 grid grid-cols-1 gap-6 2xl:grid-cols-5">
-        <Reveal className="card rounded-xl2 p-8 2xl:col-span-3">
-          <h2 className="text-[1.35rem] font-bold text-ink">Send a message</h2>
-          <p className="mt-2 mb-7 text-[1.05rem] text-ink-muted">
-            Fields marked <span className="font-semibold text-blueberry">*</span> are required.
-          </p>
-          <ContactForm />
-        </Reveal>
+      <Reveal className="mt-[clamp(16px,2.6vh,34px)] block">
+        <div
+          className={`flex flex-col gap-[18px] rounded-[28px] border border-line [background:var(--glass-bg)] px-[14px] py-[clamp(14px,2vh,24px)] [box-shadow:var(--glass-shadow)] max-sm:gap-[12px] max-sm:rounded-[22px] max-sm:p-[12px] lg:grid lg:grid-cols-[minmax(clamp(280px,calc(60vw-360px),440px),0.8fr)_minmax(0,1.35fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-[clamp(16px,1.6vw,28px)] lg:px-[clamp(14px,1.4vw,24px)] ${PANEL_H}`}
+        >
+          {/* ---- FAQ card (after the form below 1100px) ---- */}
+          <aside
+            aria-labelledby="faq-heading"
+            className="relative order-last flex min-h-0 min-w-0 flex-col gap-[clamp(16px,2.4vh,28px)] overflow-hidden rounded-[20px] px-[clamp(18px,1.6vw,28px)] py-[clamp(18px,2.4vh,30px)] text-[#f6ecd9] [background:radial-gradient(70%_50%_at_0%_0%,rgba(255,122,26,0.22),transparent_60%),radial-gradient(60%_50%_at_100%_100%,rgba(227,164,127,0.18),transparent_60%),#1c0f0b] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_60px_-36px_rgba(20,10,8,0.6)] lg:order-none"
+          >
+            <div className="flex flex-none flex-col gap-[8px]">
+              <p className="text-[12px] font-semibold tracking-[0.08em] text-[#ff7a1a] uppercase">FAQs</p>
+              <h2
+                id="faq-heading"
+                className="text-[length:clamp(20px,min(1.7vw,3vh),30px)] leading-[1.12] font-bold tracking-[-0.022em] text-[#f6ecd9]"
+              >
+                Quick answers.
+                <span className="block font-semibold text-[rgba(246,236,217,0.62)]">Still have one? Write below.</span>
+              </h2>
+            </div>
 
-        <div className="flex min-w-0 flex-col gap-6 2xl:col-span-2">
-          <Reveal delay={0.08} className="card rounded-xl2 p-8">
-            <h2 className="text-[1.3rem] font-bold text-ink">Reach me directly</h2>
-            <ul className="mt-5 flex flex-col gap-4">
-              {channels.map((channel) => (
-                <li key={channel.label}>
-                  <ChannelRow {...channel} />
-                </li>
-              ))}
+            <ul className="scrollbar-hidden flex min-h-0 flex-1 flex-col overflow-y-auto border-t border-[rgba(255,255,255,0.1)]">
+              {faqs.map((faq, i) => {
+                const isOpen = open === i;
+                return (
+                  <li key={faq.q} className="border-b border-[rgba(255,255,255,0.1)]">
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-a-${i}`}
+                      onClick={() => setOpen(isOpen ? null : i)}
+                      className="group grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-[clamp(12px,1.1vw,18px)] py-[clamp(9px,1.3vh,13px)] text-left focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7a1a]"
+                    >
+                      <span className="pt-[3px] text-[length:clamp(11px,0.72vw,12.5px)] font-bold tracking-[0.12em] text-[#ff7a1a] max-sm:text-[12px]">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-[length:clamp(13px,min(0.95vw,1.8vh),15.5px)] leading-[1.3] font-semibold tracking-[-0.01em] transition-colors duration-200 group-hover:text-[#ff7a1a] max-sm:text-[15px]">
+                        {faq.q}
+                      </span>
+                      <Icon
+                        name="caret-down"
+                        size={14}
+                        weight="bold"
+                        className={`transition-[rotate,color] duration-[260ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] ${isOpen ? "rotate-180 text-[#ff7a1a]" : "text-[rgba(246,236,217,0.62)]"}`}
+                      />
+                    </button>
+                    {isOpen && (
+                      <div id={`faq-a-${i}`} className="pr-[28px] pb-[clamp(10px,1.4vh,14px)] pl-[calc(1.6em+clamp(12px,1.1vw,18px))]">
+                        <p className="animate-[faq-in_.26s_cubic-bezier(0.25,0.1,0.25,1)_both] text-[length:clamp(12px,min(0.85vw,1.6vh),14px)] leading-[1.5] text-[rgba(246,236,217,0.62)] max-sm:text-[14px] motion-reduce:animate-none">
+                          {faq.a}
+                        </p>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
 
-            <div className="mt-7 border-t border-line pt-6">
-              <p className="text-[0.88rem] font-semibold tracking-wide text-ink-muted uppercase">
-                Find me on
-              </p>
-              <ul className="mt-3 flex flex-wrap gap-2.5">
+            <div className="flex flex-none flex-wrap items-center justify-start gap-x-[18px] gap-y-[10px]">
+              <a
+                href={`mailto:${site.email}`}
+                className="inline-flex min-h-[36px] flex-none items-center gap-[8px] rounded-full bg-[rgba(255,255,255,0.06)] px-[14px] py-[9px] text-[length:clamp(12px,0.8vw,13.5px)] leading-[1.3] font-semibold whitespace-nowrap text-[#f6ecd9] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] transition-[background-color,translate] duration-200 hover:-translate-y-[1px] hover:bg-[rgba(255,255,255,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7a1a] max-sm:text-[14px] max-[380px]:gap-[6px] max-[380px]:px-[12px] max-[380px]:text-[12px]!"
+              >
+                {/* The whole address always shows: the pill grows to fit it (no ellipsis). */}
+                <Icon name="email" size={16} weight="bold" className="flex-none text-[#ff7a1a]" />
+                <span>{site.email}</span>
+              </a>
+              <ul className="flex gap-[8px]">
                 {site.socials.map((social) => (
                   <li key={social.label}>
                     <a
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-[3rem] items-center gap-2 rounded-2xl border border-line bg-cream-soft px-4 text-[1rem] font-semibold text-ink transition hover:border-blueberry hover:bg-cream"
+                      aria-label={`${social.label} profile`}
+                      className="grid h-[36px] w-[36px] place-items-center rounded-full bg-[rgba(255,255,255,0.06)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] transition-[background-color,translate] duration-200 hover:-translate-y-[2px] hover:bg-[rgba(255,255,255,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7a1a] max-sm:h-[44px] max-sm:w-[44px]"
                     >
-                      <Icon name={social.icon as IconName} size={22} weight="fill" className="text-blueberry" />
-                      {social.label}
+                      <Icon name={social.icon as IconName} size={17} weight="fill" />
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-          </Reveal>
+          </aside>
 
-          <Reveal delay={0.14} className="rounded-xl2 bg-blueberry p-8 text-cream">
-            <Icon name="sparkle" size={34} weight="duotone" className="text-cream" />
-            <h2 className="mt-4 text-[1.3rem] font-bold text-cream">Prefer to talk it through?</h2>
-            <p className="mt-2.5 text-[1.05rem] leading-relaxed text-cream/85">
-              Book a free 20-minute call. No pitch — we map the problem and I tell you
-              straight whether I am the right person for it.
-            </p>
-            <a
-              href={`mailto:${site.email}?subject=${encodeURIComponent("Book a discovery call")}`}
-              className="mt-6 inline-flex min-h-[3.25rem] items-center gap-2.5 rounded-2xl bg-cream px-6 text-[1.05rem] font-semibold text-blueberry transition hover:-translate-y-0.5 hover:bg-white"
+          {/* ---- Form card ---- */}
+          <div className="flex min-h-0 min-w-0 rounded-[20px] border border-line-strong bg-surface shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_2px_rgba(6,12,26,0.04),0_24px_50px_-36px_rgba(58,28,22,0.45)]">
+            <form
+              aria-label="Contact form"
+              onSubmit={(event) => event.preventDefault()}
+              className="relative flex min-h-0 min-w-0 flex-1 flex-col gap-[clamp(10px,1.5vh,16px)] px-[clamp(18px,1.6vw,28px)] py-[clamp(18px,2.4vh,28px)]"
             >
-              Book a call
-              <Icon name="arrow-up-right" size={20} weight="bold" />
-            </a>
-          </Reveal>
-        </div>
-      </div>
-
-      {/* ---- FAQ (also feeds FAQPage structured data) ---- */}
-      <Reveal className="mt-14 block">
-        <h2 className="text-[clamp(1.6rem,2.6vw,2.1rem)] font-bold text-ink">
-          Questions people ask first
-        </h2>
-        <ul className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {faqs.map((faq) => (
-            <li key={faq.q}>
-              <details className="card group rounded-xl2 p-0 [&[open]]:border-line-strong">
-                <summary className="flex min-h-[4rem] cursor-pointer list-none items-center justify-between gap-4 px-7 py-5 text-[1.15rem] font-semibold text-ink marker:hidden">
-                  {faq.q}
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cream text-blueberry transition group-open:rotate-45">
-                    <Icon name="plus" size={22} weight="bold" />
-                  </span>
-                </summary>
-                <p className="border-t border-line px-7 py-5 text-[1.05rem] leading-relaxed text-ink-muted">
-                  {faq.a}
+              {/* Honeypot: hidden from people, filled only by bots. */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-[10000px] h-px w-px opacity-0"
+              />
+              <div className="grid grid-cols-2 gap-[clamp(10px,1vw,16px)] max-[560px]:grid-cols-1">
+                <label className="flex min-w-0 flex-col gap-[6px]">
+                  <span className={LABEL}>First name</span>
+                  <input name="firstName" type="text" required maxLength={80} autoComplete="given-name" placeholder="Juan" className={INPUT} />
+                </label>
+                <label className="flex min-w-0 flex-col gap-[6px]">
+                  <span className={LABEL}>Last name</span>
+                  <input name="lastName" type="text" required maxLength={80} autoComplete="family-name" placeholder="Dela Cruz" className={INPUT} />
+                </label>
+              </div>
+              <label className="flex min-w-0 flex-col gap-[6px]">
+                <span className={LABEL}>Email</span>
+                <input name="email" type="email" required maxLength={254} autoComplete="email" placeholder="you@yourbusiness.com" className={INPUT} />
+              </label>
+              <label className="flex min-h-0 min-w-0 flex-1 flex-col gap-[6px]">
+                <span className={LABEL}>Tell me more about your business</span>
+                <textarea
+                  name="message"
+                  required
+                  maxLength={5000}
+                  placeholder="Which process takes the most time? What tools are you using now?"
+                  className={`${INPUT} min-h-[160px] flex-1 resize-none lg:min-h-[96px]`}
+                />
+              </label>
+              <div className="flex flex-none flex-wrap items-center gap-x-[16px] gap-y-[10px]">
+                <button
+                  type="submit"
+                  disabled
+                  className="inline-flex cursor-not-allowed items-center gap-[9px] rounded-full bg-ink py-[12px] pr-[20px] pl-[18px] text-[length:clamp(13px,0.85vw,14.5px)] font-bold tracking-[-0.005em] text-cream opacity-40 grayscale max-sm:text-[15px]"
+                >
+                  <Icon name="send" size={17} weight="duotone" className="text-[#ff7a1a]" />
+                  Work in Progress
+                  <Icon name="arrow-up-right" size={14} weight="bold" />
+                </button>
+                <p className="text-[length:clamp(11.5px,0.75vw,13px)] text-ink-muted max-sm:text-[12.5px]">
+                  One business day. No newsletter, no drip.
                 </p>
-              </details>
-            </li>
-          ))}
-        </ul>
+              </div>
+            </form>
+          </div>
+        </div>
       </Reveal>
     </section>
-  );
-}
-
-function ChannelRow({
-  icon,
-  label,
-  value,
-  href,
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  href: string | null;
-}) {
-  const inner = (
-    <>
-      <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cream text-blueberry">
-        <Icon name={icon as IconName} size={24} weight="duotone" />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[0.85rem] font-semibold tracking-wide text-ink-muted uppercase">
-          {label}
-        </span>
-        <span className="block text-[1.05rem] font-medium break-words text-ink">
-          {value.includes("@") ? (
-            <>
-              {value.slice(0, value.indexOf("@") + 1)}
-              <wbr />
-              {value.slice(value.indexOf("@") + 1)}
-            </>
-          ) : (
-            value
-          )}
-        </span>
-      </span>
-    </>
-  );
-
-  if (!href) {
-    return <span className="flex items-center gap-3.5">{inner}</span>;
-  }
-
-  return (
-    <a
-      href={href}
-      className="flex items-center gap-3.5 rounded-2xl transition hover:text-blueberry"
-    >
-      {inner}
-    </a>
   );
 }

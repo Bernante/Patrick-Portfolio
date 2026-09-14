@@ -67,9 +67,9 @@ type Tile = {
 const TILES: Tile[] = [
   { n: "01", label: "Projects", href: "/projects", title: "Real apps, funnels and GHL builds", desc: "Automations, funnels and sites I've built.", img: projectShots[0].src },
   { n: "02", label: "Services", href: "/services", title: "What I build", desc: "Automation, CRM, funnels, websites and apps.", icon: "funnel", variant: "tint", orangeTile: true },
-  { n: "03", label: "About", href: "/about", title: `Hi, I'm ${site.firstName}.`, desc: "AI automation, web dev and video, from the Philippines.", img: asset("/about/about-illustration.webp") },
+  { n: "03", label: "About", href: "/about", title: `Hi, I’m ${site.firstName}.`, desc: "I build the systems that keep businesses running seamlessly behind the scenes.", img: asset("/about/about-illustration.webp") },
   { n: "04", label: "Testimonials", href: "/testimonials", title: "What clients say", desc: "Real words from real clients, coming soon.", icon: "chats", variant: "accent" },
-  { n: "05", label: "Contact", href: "/contact", title: "Tell me what to automate", desc: "Send a note. I reply within one business day.", icon: "email" },
+  { n: "05", label: "Contact", href: "/contact", title: "FAQs / Contact", desc: "Quick answers, and how to reach me.", icon: "email" },
 ];
 
 /**

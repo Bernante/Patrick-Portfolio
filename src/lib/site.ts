@@ -27,7 +27,7 @@ export const site = {
   // The live address (GitHub Pages). Change this if you move to your own domain.
   url: "https://bernante.github.io/Patrick-Portfolio",
   locale: "en_PH",
-  email: "hello@patrickbernante.com",
+  email: "patrickbernante44@gmail.com",
   phone: "+63 900 000 0000",
   location: "Philippines · Working with clients worldwide",
   availability: "Available for new projects",
@@ -46,7 +46,7 @@ export const nav = [
   { href: "/services", label: "Services", icon: "stack" },
   { href: "/testimonials", label: "Testimonials", icon: "star" },
   { href: "/about", label: "About", icon: "user" },
-  { href: "/contact", label: "Contact", icon: "chat" },
+  { href: "/contact", label: "FAQs / Contact", icon: "chat" },
 ] as const;
 
 export type NavHref = (typeof nav)[number]["href"];
@@ -75,7 +75,7 @@ export const pages = {
   about: {
     title: "About",
     description:
-      "Patrick Bernante — AI automation specialist, web developer and video editor. How I work, what I build with, and what I care about.",
+      "Patrick Bernante — BS Information Technology graduate from Holy Name University and former IT Specialist for the Provincial Government of Bohol, working in web development, IT operations and automation.",
   },
   testimonials: {
     title: "Testimonials",
@@ -83,9 +83,9 @@ export const pages = {
       "What coaches, agencies and small teams say about working with Patrick Bernante on AI automation, web development and video.",
   },
   contact: {
-    title: "Contact",
+    title: "FAQs / Contact",
     description:
-      "Tell me what you want to stop doing by hand. Send a short note about your project and I'll reply within one business day.",
+      "Quick answers about what Patrick Bernante builds — web development, automation and AI — and how to reach him.",
   },
 } as const;
 
@@ -213,21 +213,30 @@ export const homeFacts = [
   { value: "1 day", label: "Reply time" },
 ] as const;
 
+/**
+ * FAQs on the Contact page (also the FAQPage structured data). Only facts the
+ * owner has given: the services on the Services page, his degree and IT
+ * Specialist role, the Philippines / GMT+8, and the one-business-day reply.
+ */
 export const faqs = [
   {
-    q: "How long does a typical build take?",
-    a: "A focused automation or landing page is usually 1–2 weeks. A full GoHighLevel system or custom website runs 3–6 weeks depending on scope. You get a timeline in writing before anything starts.",
+    q: "What do you actually build?",
+    a: "Web development, GoHighLevel and n8n automations, CRM setup, funnels, custom websites and small apps. I turn ideas and repetitive processes into simple, useful solutions.",
   },
   {
-    q: "Do you work with people who are not technical?",
-    a: "Most of my clients are not. I explain things in plain language, avoid jargon, and hand over a recorded walkthrough so you are never stuck waiting on me to press a button.",
+    q: "What is your background?",
+    a: "I’m a BS Information Technology graduate from Holy Name University, and I’ve worked as an IT Specialist for the Provincial Government of Bohol.",
   },
   {
-    q: "What do you need from me to start?",
-    a: "A short call, access to the tools you already use, and an honest picture of the process you want fixed. I handle the rest and come back with a plan.",
+    q: "Do I have to be on GoHighLevel?",
+    a: "Not at all. I build around your workflow, not a specific platform. Whether you’re using GoHighLevel, Zapier, n8n, a custom CRM, or a combination of tools, I’ll work with what makes the most sense. If your current stack is a poor fit, I’ll say so upfront.",
   },
   {
-    q: "Can you take over a half-finished project?",
-    a: "Yes. I audit what exists first, tell you honestly what is worth keeping, and quote only for the work that actually needs doing.",
+    q: "How much do you charge?",
+    a: "It depends on the build. Tell me what you need below and I will reply with what it would take.",
+  },
+  {
+    q: "What happens after I write?",
+    a: "I read it myself and reply within one business day. I’m based in the Philippines, on GMT+8.",
   },
 ];

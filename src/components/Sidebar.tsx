@@ -20,7 +20,7 @@ export function Sidebar() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <aside className="no-print scrollbar-hidden hidden border-r border-line bg-surface lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[312px] lg:shrink-0 lg:flex-col lg:overflow-y-auto lg:px-[30px] lg:pt-[clamp(28px,4vh,52px)] lg:pb-[28px]">
+    <aside data-sidebar className="no-print scrollbar-hidden hidden border-r border-line bg-surface lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[312px] lg:shrink-0 lg:flex-col lg:overflow-y-auto lg:px-[30px] lg:pt-[clamp(28px,4vh,52px)] lg:pb-[28px]">
       {/* Profile */}
       <div className="flex flex-col items-center text-center">
         <Link href="/" className="rounded-full">

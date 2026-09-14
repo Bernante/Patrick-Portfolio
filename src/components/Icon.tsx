@@ -1,11 +1,14 @@
 import type { IconProps, IconWeight } from "@phosphor-icons/react";
 import {
+  ArrowCounterClockwise,
   ArrowRight,
   ArrowUpRight,
   Bell,
+  PersonArmsSpread,
   Blueprint,
   Browsers,
   CalendarCheck,
+  CaretDown,
   Check,
   Clock,
   Coffee,
@@ -66,10 +69,13 @@ import {
 const registry = {
   "arrow-right": ArrowRight,
   "arrow-up-right": ArrowUpRight,
+  accessibility: PersonArmsSpread,
+  reset: ArrowCounterClockwise,
   bell: Bell,
   blueprint: Blueprint,
   browser: Browsers,
   calendar: CalendarCheck,
+  "caret-down": CaretDown,
   "check-plain": Check,
   clock: Clock,
   coffee: Coffee,

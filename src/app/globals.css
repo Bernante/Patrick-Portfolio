@@ -464,6 +464,18 @@ html {
   --flow-node-border: rgba(255, 241, 166, 0.24);
 }
 
+/* Contact FAQ answer: fades in and drops 4px into place (0.26s). */
+@keyframes faq-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Stage icon: hops up 2px and grows to 106%, then rests (2.4s loop, staggered). */
 @keyframes svc-lit {
   0%,
@@ -548,6 +560,52 @@ html {
 
 :root[data-perf="low"] .flow-signal {
   display: none;
+}
+
+/* ==========================================================================
+   Accessibility widget settings (A11yWidget.tsx), from the reference site.
+   Each switch is a data attribute on <html>, set before first paint by the
+   inline script in layout.tsx and saved in localStorage "pb-a11y".
+   ========================================================================== */
+
+/* Text size: the sidebar and page content are enlarged (the tab bar is not). */
+:root[data-a11y-text="lg"] [data-sidebar] > *,
+:root[data-a11y-text="lg"] #main > * {
+  zoom: 1.12;
+}
+
+:root[data-a11y-text="xl"] [data-sidebar] > *,
+:root[data-a11y-text="xl"] #main > * {
+  zoom: 1.25;
+}
+
+/* High contrast: darker secondary text and stronger edges. */
+:root[data-a11y-contrast="true"] {
+  --color-ink-muted: #3f2a22;
+  --color-line: #b89a52;
+  --color-line-strong: #8a6a33;
+}
+
+:root[data-a11y-contrast="true"][data-theme="dark"] {
+  --color-ink-muted: rgba(246, 236, 217, 0.92);
+  --color-line: rgba(255, 241, 166, 0.3);
+  --color-line-strong: rgba(255, 241, 166, 0.46);
+}
+
+/* Reduce motion: no animation, transition, drifting or smooth scrolling. */
+:root[data-a11y-motion="true"],
+:root[data-a11y-motion="true"] *,
+:root[data-a11y-motion="true"] ::before,
+:root[data-a11y-motion="true"] ::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Underline links: every link in the page content gets a line. */
+:root[data-a11y-links="true"] #main a {
+  text-decoration-line: underline;
+  text-underline-offset: 0.18em;
 }
 
 /* ==========================================================================

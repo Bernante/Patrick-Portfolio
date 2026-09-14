@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
+import { A11yWidget } from "@/components/A11yWidget";
 import { JsonLd } from "@/components/JsonLd";
 import { FloatingThemeToggle } from "@/components/FloatingThemeToggle";
 import { MobileTabBar } from "@/components/MobileTabBar";
@@ -114,7 +115,7 @@ export default function RootLayout({
             // Also sets the theme before first paint (no light flash for a
             // saved dark choice). Only a saved "dark" gives dark; a first visit
             // or blocked storage is light, like the reference.
-            __html: `document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('pb-theme')==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}try{var p=sessionStorage.getItem('pb-perf-tier');if(p==='mid'||p==='low')document.documentElement.dataset.perf=p}catch(e){}`,
+            __html: `document.documentElement.classList.add('js');try{document.documentElement.dataset.theme=localStorage.getItem('pb-theme')==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}try{var p=sessionStorage.getItem('pb-perf-tier');if(p==='mid'||p==='low')document.documentElement.dataset.perf=p}catch(e){}try{var a=JSON.parse(localStorage.getItem('pb-a11y')||'{}'),r=document.documentElement;if(a.text==='lg'||a.text==='xl')r.dataset.a11yText=a.text;if(a.contrast===true)r.dataset.a11yContrast='true';if(a.motion===true)r.dataset.a11yMotion='true';if(a.links===true)r.dataset.a11yLinks='true'}catch(e){}`,
           }}
         />
       </head>
@@ -163,6 +164,7 @@ export default function RootLayout({
 
           <MobileTabBar />
           <FloatingThemeToggle />
+          <A11yWidget />
         </CustomCursor>
       </body>
     </html>
