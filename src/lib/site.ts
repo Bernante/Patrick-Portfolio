@@ -207,7 +207,8 @@ export const services = [
  * and the one-business-day reply promised on the Contact page.
  */
 export const homeFacts = [
-  { value: String(services.length), label: "Services" },
+  // 5 = the service cards on the Services page (Services.tsx OFFERS), not the older `services` list below.
+  { value: "5", label: "Services" },
   { value: "GMT+8", label: "PH time" },
   { value: "1 day", label: "Reply time" },
 ] as const;

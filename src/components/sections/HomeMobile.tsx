@@ -60,11 +60,13 @@ type Tile = {
   img?: string;
   icon?: IconName;
   variant?: "tint" | "accent";
+  /** Icon in the orange rounded tile used on the Services page method cards. */
+  orangeTile?: boolean;
 };
 
 const TILES: Tile[] = [
   { n: "01", label: "Projects", href: "/projects", title: "Real apps, funnels and GHL builds", desc: "Automations, funnels and sites I've built.", img: projectShots[0].src },
-  { n: "02", label: "Services", href: "/services", title: "What I build", desc: "AI automation, GoHighLevel, web and video.", icon: "stack", variant: "tint" },
+  { n: "02", label: "Services", href: "/services", title: "What I build", desc: "Automation, CRM, funnels, websites and apps.", icon: "funnel", variant: "tint", orangeTile: true },
   { n: "03", label: "About", href: "/about", title: `Hi, I'm ${site.firstName}.`, desc: "AI automation, web dev and video, from the Philippines.", img: asset("/about/about-illustration.webp") },
   { n: "04", label: "Testimonials", href: "/testimonials", title: "What clients say", desc: "Real words from real clients, coming soon.", icon: "chats", variant: "accent" },
   { n: "05", label: "Contact", href: "/contact", title: "Tell me what to automate", desc: "Send a note. I reply within one business day.", icon: "email" },
@@ -113,6 +115,12 @@ export function HomeExplore() {
               </span>
               {tile.img ? (
                 <img src={tile.img} alt="" loading="lazy" decoding="async" className="block h-[170px] w-full object-cover object-top" />
+              ) : tile.orangeTile ? (
+                <span className="grid h-[170px] place-items-center">
+                  <span className="grid h-[84px] w-[84px] place-items-center rounded-[24px] bg-[rgba(255,122,26,0.14)] text-[#ff7a1a] shadow-[inset_0_0_0_1px_rgba(255,122,26,0.28)]">
+                    <Icon name={tile.icon ?? "sparkle"} size={44} weight="regular" />
+                  </span>
+                </span>
               ) : (
                 <span className="grid h-[170px] place-items-center text-blueberry">
                   <Icon name={tile.icon ?? "sparkle"} size={52} weight="duotone" />
