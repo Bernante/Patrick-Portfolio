@@ -371,9 +371,10 @@ function ProjectReel() {
                     aria-hidden="true"
                     className="flex items-center gap-1.5 border-b border-line bg-cream-soft px-3 py-1.5"
                   >
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: ACCENT }} />
-                    <span className="h-2 w-2 rounded-full bg-line-strong" />
-                    <span className="h-2 w-2 rounded-full bg-line-strong" />
+                    {/* Real macOS window buttons: close, minimise, zoom. */}
+                    <span className="h-2 w-2 rounded-full bg-[#ff5f57]" />
+                    <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
+                    <span className="h-2 w-2 rounded-full bg-[#28c840]" />
                   </div>
                   <img
                     src={shot.src}

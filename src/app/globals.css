@@ -413,6 +413,28 @@ html {
   }
 }
 
+/* Projects pop-up (see Projects.tsx), from the reference: the dark backdrop
+   fades in over 0.26s while the screenshot row rises 18px and grows from 98.5%. */
+@keyframes pmodal-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pmodal-panel {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ==========================================================================
    Scroll reveal — progressive enhancement
    Content is visible by default. Only once JS has run (html.js) is it hidden

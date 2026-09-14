@@ -156,20 +156,8 @@ export default function RootLayout({
             {/* Phones/tablets, like the reference: 20px sides, 22px top and
                 96px bottom (clears the tab bar), plus the iPhone safe areas. */}
             <main id="main" className="min-w-0 flex-1 px-[20px] pt-[calc(22px+env(safe-area-inset-top,0px))] pb-[calc(96px+env(safe-area-inset-bottom,0px))] [@media(max-height:500px)]:pb-10 lg:px-[56px] lg:py-12 fit:has-[#home]:py-[clamp(32px,5vh,54px)]">
-              <div className="flex w-full flex-col gap-20 lg:gap-24 fit:[&:has(#home)>footer]:hidden">
-                {/* On one-screen desktops the home page has no footer (see Hero.tsx). */}
-                {children}
-
-                {/* Desktop only: the reference's phone pages end without a footer. */}
-                <footer className="hidden border-t border-line-strong pt-8 pb-2 lg:block">
-                  <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                    <p className="text-[1rem] text-ink-muted">
-                      © {new Date().getFullYear()} {site.name}. Built with Next.js.
-                    </p>
-                    <p className="text-[1rem] font-semibold text-ink-soft">{site.shortRole}</p>
-                  </div>
-                </footer>
-              </div>
+              {/* No page footer: the copyright lives in the sidebar, like the reference. */}
+              <div className="flex w-full flex-col gap-20 lg:gap-24">{children}</div>
             </main>
           </div>
 

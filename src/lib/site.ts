@@ -18,7 +18,7 @@ export const site = {
   firstName: "Patrick",
   role: "AI Automation Specialist, Web Developer & Video Editor",
   shortRole: "AI Automation · Web Dev · Video",
-  tagline: "Build it once. Run it forever.",
+  tagline: "Create once. Run endlessly.",
   // One-line description under the home headline. Separate from `intro`, which
   // still feeds the SEO description and structured data.
   heroDescription: "I help coaches and agencies turn every lead into a booked call, on autopilot.",

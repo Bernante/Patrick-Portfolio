@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { asset } from "@/lib/site";
 import { Icon } from "../Icon";
 import { Reveal } from "../Reveal";
@@ -20,14 +21,33 @@ import { Reveal } from "../Reveal";
  *  - Titles 14px and descriptions 12px under 640px; the header leaves room for
  *    the floating theme button.
  *
- * No photos yet, on purpose: the Automations frames and the Funnels pages are
- * blank until the owner supplies real screenshots. Logos are tool logos that
- * already ship with the site.
+ * Automations shows the owner's real workflow screenshots (AUTOMATIONS below)
+ * plus blank slots for future ones; pressing the card opens the full-size
+ * pop-up. The Funnels pages stay blank until the owner supplies screenshots.
+ * Logos are tool logos that already ship with the site.
  */
 
 const GHL_LOGO = asset("/logos/gohighlevel.png");
 const N8N_LOGO = asset("/logos/n8n.svg");
 const CLAUDE_LOGO = asset("/logos/claude.svg");
+
+type Shot = { title: string; src: string; width: number; height: number } | { title: string; src: null };
+
+/**
+ * Automations screenshots, shown in the card reel and the pop-up in this order.
+ * To add a project, replace a blank slot: put the image in
+ * public/projects/automations/ and give its title, path and pixel size.
+ */
+const AUTOMATIONS: Shot[] = [
+  {
+    title: "Order Assistant — Messenger (Meta Direct)",
+    src: asset("/projects/automations/order-assistant-messenger.webp"),
+    width: 1820,
+    height: 877,
+  },
+  { title: "Coming soon", src: null },
+  { title: "Coming soon", src: null },
+];
 
 type Category = "ghl" | "funnels" | "ai";
 type Filter = "all" | Category;
@@ -55,6 +75,13 @@ const ROW_H = "xl:h-[clamp(240px,35vh,340px)]";
 
 export function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
+  const [automationsOpen, setAutomationsOpen] = useState(false);
+  const openerRef = useRef<HTMLButtonElement>(null);
+  // Closing hands focus back to the card, like the reference.
+  const closeAutomations = useCallback(() => {
+    setAutomationsOpen(false);
+    openerRef.current?.focus();
+  }, []);
 
   const shows = (cats: Category[]) => filter === "all" || cats.includes(filter);
   // Filtering only applies to the phone layout; desktop always shows all cards.
@@ -71,10 +98,10 @@ export function Projects() {
           id="projects-heading"
           className="text-[length:clamp(30px,3.1vw,60px)] leading-[1.06] font-bold tracking-[-0.028em] text-ink"
         >
-          Real apps, funnels and GHL builds you can open.
+          From idea to working system.
         </h1>
         <p className="text-[length:clamp(14px,1vw,19px)] leading-[1.6] text-ink-muted">
-          Everything here shipped. Open a card to walk through the work at full size.
+          Real apps, n8n automations, GoHighLevel funnels, and AI systems built and shipped.
         </p>
       </header>
 
@@ -105,13 +132,31 @@ export function Projects() {
           <ul className="grid grid-cols-2 gap-[10px] lg:gap-[clamp(10px,1vw,16px)] xl:grid-cols-4">
             {/* ---- Automations (two columns wide) ---- */}
             <li
-              className={`${CARD} ${ROW_H} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] lg:grid lg:grid-cols-2 lg:gap-x-[14px] lg:gap-y-3 ${phoneHidden(["ghl"])}`}
+              className={`${CARD} ${ROW_H} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] [transition:transform_.35s_cubic-bezier(0.22,1,0.36,1),box-shadow_.35s,border-color_.35s,scale_.34s_cubic-bezier(0.2,0.8,0.2,1)] active:scale-[0.97] lg:grid lg:grid-cols-2 lg:gap-x-[14px] lg:gap-y-3 ${phoneHidden(["ghl"])}`}
             >
-              <CardHead
-                logos={[GHL_LOGO, N8N_LOGO]}
-                title="Automations"
-                description="Screens from the GoHighLevel and n8n workflows I build."
+              {/* The whole card is one button that opens the pop-up (reference: bento__card--btn). */}
+              <button
+                ref={openerRef}
+                type="button"
+                aria-haspopup="dialog"
+                aria-label="Open Automations screenshots"
+                onClick={() => setAutomationsOpen(true)}
+                className="absolute inset-0 z-[1] cursor-pointer rounded-[22px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blueberry"
               />
+              <div className="relative min-w-0">
+                <CardHead
+                  logos={[GHL_LOGO, N8N_LOGO]}
+                  title="Automations"
+                  description="Screens from the GoHighLevel and n8n workflows I build."
+                />
+                {/* Arrow that slides in on hover (reference: bento__arrow). */}
+                <span
+                  aria-hidden="true"
+                  className="absolute top-[2px] right-0 text-blueberry opacity-0 [translate:-4px_4px] transition-[opacity,translate] duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-focus-within:opacity-100 group-focus-within:[translate:0_0] group-hover:opacity-100 group-hover:[translate:0_0]"
+                >
+                  <Icon name="arrow-up-right" size={18} weight="bold" />
+                </span>
+              </div>
               <ScreenReel />
             </li>
 
@@ -134,6 +179,8 @@ export function Projects() {
           </ul>
         </div>
       </Reveal>
+
+      {automationsOpen && <AutomationsModal onClose={closeAutomations} />}
     </section>
   );
 }
@@ -172,16 +219,29 @@ function CardHead({ logos, title, description }: { logos: string[]; title: strin
   );
 }
 
-/** Frames per loop half in the Automations reel. */
-const FRAMES = 4;
+/** Real macOS window buttons: close, minimise, zoom. */
+function WindowDots({ size }: { size: number }) {
+  return (
+    <>
+      {["#ff5f57", "#febc2e", "#28c840"].map((color) => (
+        <span
+          key={color}
+          className="rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
+          style={{ width: size, height: size, backgroundColor: color }}
+        />
+      ))}
+    </>
+  );
+}
 
 /**
- * Automations media: blank browser frames that drift, as on the reference.
+ * Automations media: small browser frames of AUTOMATIONS that drift, as on the
+ * reference. Blank slots show an empty frame.
  *  - Desktop: a column drifting up (22s per loop) with a 12% top/bottom fade.
  *  - Phones/tablets: a 150px strip of 200px frames drifting sideways (26s per
  *    loop) with an 8% side fade.
- * Paused until hover or focus, pauses in place. Spacing is padding, not gap, so
- * the two halves are exactly equal and the loop is seamless.
+ * Paused until hover or focus, pauses in place. The list is drawn twice and
+ * spacing is padding, not gap, so the two halves are equal and the loop is seamless.
  */
 function ScreenReel() {
   return (
@@ -190,20 +250,120 @@ function ScreenReel() {
       className="flex h-[150px] min-h-0 items-center overflow-hidden rounded-[14px] mask-[linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] lg:block lg:h-full lg:mask-[linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)]"
     >
       <div className="flex w-max animate-[drift-left_26s_linear_infinite] [animation-play-state:paused] group-focus-within:[animation-play-state:running] group-hover:[animation-play-state:running] lg:block lg:w-auto lg:animate-[reel-up_22s_linear_infinite]">
-        {Array.from({ length: FRAMES * 2 }, (_, i) => (
+        {[...AUTOMATIONS, ...AUTOMATIONS].map((shot, i) => (
           <div key={i} className="w-[200px] pr-[10px] lg:w-auto lg:pr-0 lg:pb-[10px]">
             <div className="relative rounded-[12px] bg-white px-[4px] pt-[18px] pb-[4px] shadow-[inset_0_0_0_1px_var(--color-line),0_6px_18px_-14px_rgba(6,12,26,0.5)]">
               <span className="absolute top-[7px] left-[9px] flex gap-[4px]">
-                <span className="h-[6px] w-[6px] rounded-full bg-blueberry" />
-                <span className="h-[6px] w-[6px] rounded-full bg-line-strong" />
-                <span className="h-[6px] w-[6px] rounded-full bg-line-strong" />
+                <WindowDots size={6} />
               </span>
-              <div className="aspect-video rounded-[7px] bg-cream-soft" />
+              {shot.src ? (
+                <img
+                  src={shot.src}
+                  alt=""
+                  width={shot.width}
+                  height={shot.height}
+                  decoding="async"
+                  className="block aspect-video w-full rounded-[7px] object-cover object-center"
+                />
+              ) : (
+                <div className="aspect-video rounded-[7px] bg-cream-soft" />
+              )}
             </div>
           </div>
         ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * Full-screen Automations pop-up, copied from the reference (.pmodal):
+ *  - 82% dark backdrop fading in over 0.26s; the row rises 18px and grows from
+ *    98.5% over 0.42s with a spring ease.
+ *  - A 42px glass close button, top right, that turns 90° on hover and takes
+ *    focus on open. Escape also closes; clicking the backdrop does not.
+ *  - One row of large window frames (light title bar, red/yellow/green dots,
+ *    16:10 screenshot) sliding left non-stop, and not pausing on hover.
+ *  - Reduced motion: the row stands still and can be scrolled sideways instead.
+ * Rendered into <body> so no transformed parent can trap its fixed position.
+ * Page scroll is locked while it is open, and Tab stays on the close button.
+ */
+function AutomationsModal({ onClose }: { onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closeRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Automations"
+      className="no-print fixed inset-0 z-[8000] grid grid-cols-[minmax(0,1fr)] place-items-center bg-[rgba(20,10,8,0.82)] px-[clamp(12px,2.4vw,40px)] pt-[clamp(56px,8vh,72px)] pb-[clamp(14px,3vh,32px)] animate-[pmodal-in_.26s_cubic-bezier(0.25,0.1,0.25,1)_both]"
+    >
+      <button
+        ref={closeRef}
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute top-[clamp(12px,2vh,20px)] right-[clamp(12px,1.6vw,24px)] z-[2] grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(255,255,255,0.22)] bg-[rgba(255,255,255,0.12)] text-white transition-[rotate,background-color] duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:rotate-90 hover:bg-[rgba(255,255,255,0.22)] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#fff1a6]"
+      >
+        <Icon name="close" size={18} weight="bold" />
+      </button>
+
+      <div className="flex h-full min-h-0 w-full max-w-[1560px] min-w-0 items-center overflow-hidden animate-[pmodal-panel_.42s_cubic-bezier(0.2,0.8,0.2,1)_both]">
+        <div className="w-full overflow-hidden motion-reduce:overflow-x-auto">
+          <ul className="flex w-max animate-[drift-left_28s_linear_infinite] motion-reduce:animate-none">
+            {[...AUTOMATIONS, ...AUTOMATIONS].map((shot, i) => (
+              <li
+                key={i}
+                // The second copy only exists for the seamless loop.
+                aria-hidden={i >= AUTOMATIONS.length || undefined}
+                className="w-[clamp(520px,46vw,820px)] shrink-0 pr-[clamp(20px,2vw,30px)] max-[720px]:w-[min(88vw,480px)]"
+              >
+                <figure className="overflow-hidden rounded-[16px] border border-[rgba(11,30,63,0.12)] bg-[#fff] shadow-[0_1px_0_rgba(11,30,63,0.03),0_18px_40px_-26px_rgba(11,30,63,0.34)]">
+                  <span aria-hidden="true" className="flex items-center gap-[6px] border-b border-[rgba(11,30,63,0.12)] bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[12px] py-[9px]">
+                    <WindowDots size={9} />
+                  </span>
+                  {shot.src ? (
+                    <img
+                      src={shot.src}
+                      alt={shot.title}
+                      width={shot.width}
+                      height={shot.height}
+                      decoding="async"
+                      className="block aspect-[16/10] w-full bg-[#f4f4ed] object-cover object-center"
+                    />
+                  ) : (
+                    <div className="grid aspect-[16/10] place-items-center bg-[#f4f4ed] text-[14px] font-semibold tracking-[0.02em] text-[#8a8f9c]">
+                      Coming soon
+                    </div>
+                  )}
+                </figure>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 

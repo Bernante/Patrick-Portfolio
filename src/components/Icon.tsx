@@ -39,6 +39,7 @@ import {
   TreeStructure,
   User,
   Wrench,
+  X,
   YoutubeLogo,
   MagicWand,
 } from "@phosphor-icons/react/dist/ssr";
@@ -56,6 +57,7 @@ const registry = {
   chat: ChatCircleDots,
   chats: Chats,
   check: CheckCircle,
+  close: X,
   code: Code,
   compass: Compass,
   drop: Drop,
