@@ -1,9 +1,9 @@
 /**
  * Sub-folder the site is served from. GitHub Pages serves this repo at
- * https://bernante.github.io/PatrickBernante-Portfolio/, so the deploy
- * workflow (.github/workflows/deploy.yml) builds with
- * NEXT_PUBLIC_BASE_PATH=/PatrickBernante-Portfolio (the repo name); locally
- * it is empty.
+ * https://bernante.github.io/Patrick-Portfolio/, so the deploy workflow
+ * (.github/workflows/deploy.yml) builds with
+ * NEXT_PUBLIC_BASE_PATH=/Patrick-Portfolio (the repo name); locally it is
+ * empty.
  *
  * Kept in its own file on purpose: site.ts exports a `process` list (the work
  * steps), which hides Node's `process` there. Next.js inlines the literal

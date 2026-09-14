@@ -6,7 +6,7 @@ import type { NextConfig } from "next";
  *  - `output: "export"` writes plain HTML/CSS/JS to `out/`; the site has no
  *    server code (the contact form opens the visitor's email app).
  *  - `basePath` comes from NEXT_PUBLIC_BASE_PATH: the workflow sets it to
- *    "/PatrickBernante-Portfolio" because Pages serves the repo from that
+ *    "/Patrick-Portfolio" (the repo name) because Pages serves the repo from that
  *    sub-folder; locally it is empty. Plain <img> paths add it via `asset()` in
  *    src/lib/site.ts.
  *  - `trailingSlash` emits /about/index.html, which Pages serves at /about/.

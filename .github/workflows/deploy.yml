@@ -1,5 +1,5 @@
 # Builds the static site and publishes it to GitHub Pages on every push to main.
-# Live at https://bernante.github.io/PatrickBernante-Portfolio/
+# Live at https://bernante.github.io/Patrick-Portfolio/
 # (Repo Settings -> Pages -> Source must be "GitHub Actions".)
 name: Deploy to GitHub Pages
 

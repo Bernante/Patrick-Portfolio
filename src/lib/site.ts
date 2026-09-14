@@ -25,7 +25,7 @@ export const site = {
   intro:
     "I build AI automations, fast websites and scroll-stopping video for coaches, agencies and small teams — so the work keeps running after you log off.",
   // The live address (GitHub Pages). Change this if you move to your own domain.
-  url: "https://bernante.github.io/PatrickBernante-Portfolio",
+  url: "https://bernante.github.io/Patrick-Portfolio",
   locale: "en_PH",
   email: "hello@patrickbernante.com",
   phone: "+63 900 000 0000",
