@@ -1,22 +1,26 @@
 import type { NextConfig } from "next";
 
 /**
- * Static export for GitHub Pages (see .github/workflows/deploy.yml).
+ * Two builds from one project:
  *
- *  - `output: "export"` writes plain HTML/CSS/JS to `out/`; the site has no
- *    server code (the contact form opens the visitor's email app).
- *  - `basePath` comes from NEXT_PUBLIC_BASE_PATH: the workflow sets it to
+ *  - Vercel (the main host): a normal Next.js build, so the contact form's
+ *    server route (src/app/api/contact/route.ts) runs there and can read the
+ *    private CONTACT_WEBHOOK_URL. No base path.
+ *  - GitHub Pages (.github/workflows/deploy.yml): STATIC_EXPORT=true gives
+ *    `output: "export"`, plain HTML/CSS/JS in `out/`. Pages cannot run server
+ *    code, so the workflow deletes src/app/api first; the form there shows its
+ *    "email me instead" message.
+ *
+ *  - `basePath` comes from NEXT_PUBLIC_BASE_PATH: the Pages workflow sets it to
  *    "/Patrick-Portfolio" (the repo name) because Pages serves the repo from that
- *    sub-folder; locally it is empty. Plain <img> paths add it via `asset()` in
- *    src/lib/site.ts.
+ *    sub-folder; locally and on Vercel it is empty. Plain <img> paths add it via
+ *    `asset()` in src/lib/site.ts.
  *  - `trailingSlash` emits /about/index.html, which Pages serves at /about/.
- *  - The old security `headers()` block was removed: static exports cannot set
- *    response headers (GitHub Pages controls those).
  */
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  output: process.env.STATIC_EXPORT === "true" ? "export" : undefined,
   basePath,
   trailingSlash: true,
   reactStrictMode: true,

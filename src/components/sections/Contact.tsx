@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { basePath } from "@/lib/base-path";
 import { faqs, site } from "@/lib/site";
 import { Icon, type IconName } from "../Icon";
 import { Reveal } from "../Reveal";
@@ -22,9 +23,11 @@ import { Reveal } from "../Reveal";
  *    fill, and the send button with a one-line note.
  *  - Below 1100px the form comes first and the FAQ card follows; under 560px
  *    the name fields and the contact row stack.
- *  - Like the reference, the form is not live yet: the button reads "Work in
- *    Progress" and is disabled. It gets a hidden honeypot field for when it is
- *    connected.
+ *  - The form posts JSON to /api/contact/ (src/app/api/contact/route.ts), which
+ *    forwards it privately (GoHighLevel webhook for now). The button shows
+ *    "Sending…", then a thank-you line replaces the note, or an error line with
+ *    the email address. A hidden honeypot field catches bots. On the GitHub
+ *    Pages copy there is no API, so it always shows the email fallback.
  * Contact links are only the owner's real socials (site.socials).
  */
 
@@ -38,8 +41,30 @@ const LABEL =
 const INPUT =
   "w-full min-w-0 rounded-[12px] border border-line-strong bg-white px-[14px] py-[clamp(10px,1.4vh,13px)] text-[length:clamp(13.5px,0.95vw,15.5px)] leading-[1.45] text-ink shadow-[inset_0_1px_2px_rgba(6,12,26,0.04)] transition-[border-color,box-shadow] duration-[180ms] placeholder:text-ink-muted placeholder:opacity-70 focus:border-[#ff7a1a] focus:shadow-[0_0_0_3px_rgba(255,122,26,0.18)] focus:outline-none max-lg:text-[16px]";
 
+type SendStatus = "idle" | "sending" | "sent" | "error";
+
 export function Contact() {
   const [open, setOpen] = useState<number | null>(0);
+  const [status, setStatus] = useState<SendStatus>("idle");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (status === "sending") return;
+    const form = event.currentTarget;
+    setStatus("sending");
+    try {
+      const response = await fetch(`${basePath}/api/contact/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      form.reset();
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
+  }
 
   return (
     <section
@@ -148,7 +173,8 @@ export function Contact() {
           <div className="flex min-h-0 min-w-0 rounded-[20px] border border-line-strong bg-surface shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_2px_rgba(6,12,26,0.04),0_24px_50px_-36px_rgba(58,28,22,0.45)]">
             <form
               aria-label="Contact form"
-              onSubmit={(event) => event.preventDefault()}
+              onSubmit={handleSubmit}
+              onInput={() => status !== "sending" && status !== "idle" && setStatus("idle")}
               className="relative flex min-h-0 min-w-0 flex-1 flex-col gap-[clamp(10px,1.5vh,16px)] px-[clamp(18px,1.6vw,28px)] py-[clamp(18px,2.4vh,28px)]"
             >
               {/* Honeypot: hidden from people, filled only by bots. */}
@@ -187,15 +213,31 @@ export function Contact() {
               <div className="flex flex-none flex-wrap items-center gap-x-[16px] gap-y-[10px]">
                 <button
                   type="submit"
-                  disabled
-                  className="inline-flex cursor-not-allowed items-center gap-[9px] rounded-full bg-ink py-[12px] pr-[20px] pl-[18px] text-[length:clamp(13px,0.85vw,14.5px)] font-bold tracking-[-0.005em] text-cream opacity-40 grayscale max-sm:text-[15px]"
+                  disabled={status === "sending"}
+                  className="inline-flex items-center gap-[9px] rounded-full bg-ink py-[12px] pr-[20px] pl-[18px] text-[length:clamp(13px,0.85vw,14.5px)] font-bold tracking-[-0.005em] text-cream transition-[translate,box-shadow,opacity] duration-200 hover:-translate-y-[1px] hover:shadow-[0_12px_24px_-14px_rgba(58,28,22,0.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff7a1a] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0 max-sm:text-[15px]"
                 >
-                  <Icon name="send" size={17} weight="duotone" className="text-[#ff7a1a]" />
-                  Work in Progress
+                  <Icon name={status === "sent" ? "check-plain" : "send"} size={17} weight={status === "sent" ? "bold" : "duotone"} className="text-[#ff7a1a]" />
+                  {status === "sending" ? "Sending…" : status === "sent" ? "Sent" : "Send message"}
                   <Icon name="arrow-up-right" size={14} weight="bold" />
                 </button>
-                <p className="text-[length:clamp(11.5px,0.75vw,13px)] text-ink-muted max-sm:text-[12.5px]">
-                  One business day. No newsletter, no drip.
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className={`text-[length:clamp(11.5px,0.75vw,13px)] max-sm:text-[12.5px] ${status === "error" ? "font-semibold text-[#c2410c]" : "text-ink-muted"}`}
+                >
+                  {status === "sent" ? (
+                    "Thanks! I will reply within one business day."
+                  ) : status === "error" ? (
+                    <>
+                      Couldn’t send right now. Email me at{" "}
+                      <a href={`mailto:${site.email}`} className="underline underline-offset-2">
+                        {site.email}
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    "One business day. No newsletter, no drip."
+                  )}
                 </p>
               </div>
             </form>

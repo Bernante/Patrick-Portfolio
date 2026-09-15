@@ -25,7 +25,13 @@ export const site = {
   intro:
     "I build AI automations, fast websites and scroll-stopping video for coaches, agencies and small teams — so the work keeps running after you log off.",
   // The live address (GitHub Pages). Change this if you move to your own domain.
-  url: "https://bernante.github.io/Patrick-Portfolio",
+  // Public address for SEO links: NEXT_PUBLIC_SITE_URL if set, else Vercel's
+  // production domain (exposed automatically on Vercel builds), else GitHub Pages.
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
+      : "https://bernante.github.io/Patrick-Portfolio"),
   locale: "en_PH",
   email: "patrickbernante44@gmail.com",
   phone: "+63 900 000 0000",

@@ -32,9 +32,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Pages cannot run server code: drop the contact form's API route (it runs
+      # on Vercel). The form here falls back to its "email me instead" message.
+      - name: Remove server-only routes
+        run: rm -rf src/app/api
+
       - name: Build static site
         run: npm run build
         env:
+          STATIC_EXPORT: "true"
           # Pages serves this repo from a sub-folder named after the repo.
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
 
