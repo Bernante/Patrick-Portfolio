@@ -614,6 +614,97 @@ html {
   text-underline-offset: 0.18em;
 }
 
+/* Framework page, build-loop canvas (see src/app/framework/page.tsx).
+   Copied from the reference: a spark travels each connector wire, and the
+   loop-back wire's dashes crawl. `--w` is the wire's own width, so one
+   keyframe serves both the short and the long wires. */
+@keyframes fw-spark {
+  0% {
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--w), -50%);
+    opacity: 0;
+  }
+}
+
+@keyframes fw-loopdash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+/* The framework page stands on its own, like the reference's: it carries its
+   own small header with a link back, so the sidebar, phone tab bar and the
+   floating buttons step aside, and `main` drops its shell padding. */
+body:has(#framework-page) [data-sidebar],
+body:has(#framework-page) nav[aria-label="Primary navigation"],
+body:has(#framework-page) .theme-btn-glass.fixed,
+body:has(#framework-page) div:has(> button[title="Accessibility options"]) {
+  display: none;
+}
+
+body:has(#framework-page) #main {
+  padding: 0;
+}
+
+/* The framework page carries the reference page's own palette and type, not
+   this site's butter/clay — it is a standalone microsite, and the owner asked
+   for it to match exactly. Values read straight off its :root. Every other page
+   is untouched: these only apply inside #framework-page. */
+#framework-page {
+  /* The reference page's own tokens, copied from its :root so this page uses
+     its scale rather than invented values: --r is its one card radius, --card
+     the translucent card fill, --card-solid the opaque one. */
+  --r: 24px;
+  --accent: #ff7a1a;
+  --accent-hover: #ffa155;
+  --accent-line: rgba(255, 122, 26, 0.4);
+  --card: rgba(255, 255, 255, 0.74);
+  --card-solid: #ffffff;
+  --ease-spring: cubic-bezier(0.2, 0.9, 0.25, 1.08);
+
+  /* Mapped onto this site's token names so the shared utilities resolve here. */
+  --color-page: #f4f4ed;
+  --color-cream: #f4f4ed;
+  --color-ink: #0b1e3f;
+  --color-ink-soft: #243a5e;
+  --color-ink-muted: #5a6479;
+  --color-line: rgba(11, 30, 63, 0.12);
+  --color-line-strong: rgba(11, 30, 63, 0.2);
+  --color-surface: rgba(255, 255, 255, 0.74);
+  --color-surface-2: #ffffff;
+  --color-blueberry: #0b1e3f;
+
+  background-color: #f4f4ed;
+  color: #0b1e3f;
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+/* The page fills the frame it is opened in, so the cream runs edge to edge,
+   with the reference's warm glow in the top right (its body::before) and none
+   of this site's own paper texture. */
+body:has(#framework-page),
+body:has(#framework-page) #main {
+  background-color: #f4f4ed;
+  background-image: none;
+}
+
+body:has(#framework-page)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background:
+    radial-gradient(900px 560px at 82% -10%, rgba(255, 122, 26, 0.1), transparent 60%),
+    #f4f4ed;
+}
+
 /* ==========================================================================
    Scroll reveal — progressive enhancement
    Content is visible by default. Only once JS has run (html.js) is it hidden

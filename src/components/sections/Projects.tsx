@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { asset } from "@/lib/site";
+import { basePath } from "@/lib/base-path";
+import { asset, site } from "@/lib/site";
 import { Icon } from "../Icon";
 import { Reveal } from "../Reveal";
 
@@ -80,11 +81,17 @@ const PANEL_H =
 export function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
   const [automationsOpen, setAutomationsOpen] = useState(false);
+  const [frameworkOpen, setFrameworkOpen] = useState(false);
   const openerRef = useRef<HTMLButtonElement>(null);
+  const frameworkRef = useRef<HTMLButtonElement>(null);
   // Closing hands focus back to the card, like the reference.
   const closeAutomations = useCallback(() => {
     setAutomationsOpen(false);
     openerRef.current?.focus();
+  }, []);
+  const closeFramework = useCallback(() => {
+    setFrameworkOpen(false);
+    frameworkRef.current?.focus();
   }, []);
 
   // Filtering only applies to the phone layout; desktop always shows all cards.
@@ -177,12 +184,21 @@ export function Projects() {
               <PageFan />
             </li>
 
-            {/* ---- 3. How I build with AI: bottom left ---- */}
-            <li className={`${CARD} col-span-2 flex flex-col sm:col-span-1 lg:col-span-5 ${phoneHidden("ai")}`}>
+            {/* ---- 3. How I build with AI: bottom left. The whole card is one
+                    button that opens the framework in a browser-style window. ---- */}
+            <li className={`${CARD} relative col-span-2 flex flex-col sm:col-span-1 lg:col-span-5 ${phoneHidden("ai")}`}>
+              <button
+                ref={frameworkRef}
+                type="button"
+                aria-haspopup="dialog"
+                aria-label="Open the Agentic Framework"
+                onClick={() => setFrameworkOpen(true)}
+                className="absolute inset-0 z-[1] cursor-pointer rounded-[22px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blueberry"
+              />
               <CardHead
                 logos={[CLAUDE_LOGO, CHATGPT_LOGO, VSCODE_LOGO]}
                 title="How I build with AI"
-                description="The tools, rules and loop I build with will be added here soon."
+                description="The tools, the rules, and the loop I use to build apps with AI."
               />
               <AiLoop />
             </li>
@@ -205,6 +221,7 @@ export function Projects() {
       </Reveal>
 
       {automationsOpen && <AutomationsModal onClose={closeAutomations} />}
+      {frameworkOpen && <FrameworkModal onClose={closeFramework} />}
     </section>
   );
 }
@@ -373,6 +390,70 @@ function AiLoop() {
         <span className="h-[6px] w-[60%] rounded-[3px] bg-[var(--tint-strong)] lg:max-[1279px]:hidden" />
       </div>
     </div>
+  );
+}
+
+/**
+ * The Agentic Framework pop-up, copied from the reference: the same dark
+ * backdrop and rounded close button as the Automations one, but the panel is a
+ * browser window — light title bar with the traffic-light dots and an address
+ * pill — holding the /framework page in an iframe, so it scrolls inside the
+ * frame exactly like the reference's.
+ */
+function FrameworkModal({ onClose }: { onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose]);
+
+  const host = site.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="The Agentic Framework"
+      className="no-print fixed inset-0 z-[8000] grid grid-cols-[minmax(0,1fr)] place-items-center bg-[rgba(20,10,8,0.82)] px-[clamp(10px,2.4vw,40px)] pt-[clamp(56px,8vh,72px)] pb-[clamp(12px,3vh,32px)] animate-[pmodal-in_.26s_cubic-bezier(0.25,0.1,0.25,1)_both]"
+    >
+      <button
+        ref={closeRef}
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute top-[clamp(12px,2vh,20px)] right-[clamp(12px,1.6vw,24px)] z-[2] grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(255,255,255,0.22)] bg-[rgba(255,255,255,0.12)] text-white transition-[rotate,background-color] duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:rotate-90 hover:bg-[rgba(255,255,255,0.22)] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#fff1a6]"
+      >
+        <Icon name="close" size={18} weight="bold" />
+      </button>
+
+      <div className="flex h-full max-h-[1000px] w-full max-w-[1460px] flex-col overflow-hidden rounded-[14px] border border-[rgba(11,30,63,0.12)] bg-white shadow-[0_40px_90px_-40px_rgba(20,10,8,0.8)] animate-[pmodal-panel_.42s_cubic-bezier(0.2,0.8,0.2,1)_both]">
+        {/* Title bar: dots, then the address pill, like a real browser. */}
+        <div className="flex flex-none items-center gap-[12px] border-b border-[rgba(11,30,63,0.1)] bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[14px] py-[9px]">
+          <WindowDots size={9} />
+          <span className="min-w-0 flex-1 truncate rounded-full bg-[rgba(255,255,255,0.75)] px-[12px] py-[5px] text-[12px] text-[#5e4036] shadow-[inset_0_0_0_1px_rgba(11,30,63,0.08)]">
+            <span className="font-semibold text-[#3a1c16]">{host}</span>
+            <span className="opacity-70">/framework/</span>
+          </span>
+        </div>
+        <iframe
+          src={`${basePath}/framework/`}
+          title={`${site.firstName}'s AI Agentic Framework`}
+          loading="lazy"
+          className="min-h-0 w-full flex-1 border-0 bg-cream"
+        />
+      </div>
+    </div>,
+    document.body,
   );
 }
 
