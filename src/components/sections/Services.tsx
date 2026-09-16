@@ -86,7 +86,8 @@ const OFFERS: { title: string; desc: string; chip: string; logos: string[]; bull
 ];
 
 const FLOW_TOOLS: { label: string; icon: IconName }[] = [
-  { label: "GoHighLevel CRM", icon: "link" },
+  { label: "GHL Automation", icon: "funnel" },
+  { label: "n8n Automation", icon: "flow" },
   { label: "Email & SMS", icon: "email" },
   { label: "AI Assistant", icon: "sparkle" },
 ];
