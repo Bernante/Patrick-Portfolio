@@ -348,46 +348,38 @@ function AppReel() {
   );
 }
 
-/**
- * How I build with AI media: a small document card in the reference's
- * bento__doc style showing the tools the site already lists (Claude, ChatGPT,
- * VS Code) linked in a loop, with faint text lines under it. It fills and
- * centres in the space left under the card head; hover lifts it 3px.
- */
-const LOOP_TOOLS = [
-  { name: "Claude", logo: CLAUDE_LOGO },
-  { name: "ChatGPT", logo: CHATGPT_LOGO },
-  { name: "VS Code", logo: VSCODE_LOGO },
-];
 
+/**
+ * Preview of the framework page inside a browser window, the media for the
+ * "How I build with AI" card. The real page runs in an iframe rather than a
+ * screenshot, so it never goes stale: it is laid out at desktop width and
+ * scaled down, and the frame clips it just below the credits line.
+ * `pointer-events-none` keeps every click on the card's own button, and the
+ * iframe only loads once the card is near the viewport.
+ */
 function AiLoop() {
+  const host = site.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
   return (
     <div aria-hidden="true" className="mt-[clamp(8px,1.2vh,14px)] grid min-h-[130px] flex-1 place-items-center">
-      {/* Grows with the screen on desktop so it fills large cards; on short 1100–1279px cards the eyebrow and text lines hide so it never clips. */}
-      <div className="flex w-full max-w-[420px] flex-col gap-[8px] rounded-[12px] bg-white px-[14px] pt-[14px] pb-[12px] shadow-[inset_0_0_0_1px_var(--color-line),0_14px_30px_-22px_rgba(58,28,22,0.45)] transition-transform duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[3px] lg:max-w-[clamp(300px,27vw,540px)] lg:gap-[clamp(6px,0.55vw,11px)] lg:px-[clamp(12px,1.1vw,22px)] lg:pt-[clamp(10px,1.1vw,20px)] lg:pb-[clamp(10px,1vw,18px)]">
-        <span className="text-[9px] font-semibold tracking-[0.12em] text-[#b4490a] uppercase max-sm:text-[10.5px] lg:text-[length:clamp(9px,0.62vw,12px)] lg:max-[1279px]:hidden dark:text-[#ff9a4d]">
-          The build loop
+      <div className="w-full max-w-[420px] overflow-hidden rounded-[12px] border border-line-strong bg-white shadow-[0_14px_30px_-22px_rgba(58,28,22,0.45)] transition-transform duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[3px] lg:max-w-[clamp(300px,27vw,540px)]">
+        <span className="flex items-center gap-[8px] border-b border-line bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[10px] py-[7px]">
+          <WindowDots size={7} />
+          <span className="min-w-0 flex-1 truncate rounded-full bg-[rgba(255,255,255,0.75)] px-[8px] py-[3px] text-[9px] leading-[1.4] text-[#5e4036] lg:text-[length:clamp(9px,0.6vw,11px)]">
+            <span className="font-semibold text-[#3a1c16]">{host}</span>
+            <span className="opacity-70">/framework/</span>
+          </span>
         </span>
-        <span className="text-[length:clamp(13px,0.9vw,19px)] leading-[1.2] font-bold tracking-[-0.01em] text-ink">Coming soon</span>
-        <span className="mt-[2px] flex flex-wrap items-center gap-[6px]">
-          {LOOP_TOOLS.map((tool, i) => (
-            <span key={tool.name} className="inline-flex items-center gap-[6px]">
-              <span
-                className={`inline-flex items-center gap-[5px] rounded-[7px] border px-[7px] py-[3px] text-[10px] font-semibold max-sm:text-[11px] lg:text-[length:clamp(10px,0.7vw,13.5px)] ${
-                  i === LOOP_TOOLS.length - 1
-                    ? "border-[#ff7a1a] bg-[#ff7a1a] text-[#fff]"
-                    : "border-line-strong text-ink"
-                }`}
-              >
-                <img src={tool.logo} alt="" width={12} height={12} className="h-[1.2em] w-[1.2em] rounded-[3px] bg-white object-contain" />
-                {tool.name}
-              </span>
-              {i < LOOP_TOOLS.length - 1 && <Icon name="arrow-right" size={11} weight="bold" className="text-ink-muted" />}
-            </span>
-          ))}
+        <span className="relative block h-[150px] overflow-hidden bg-[#f4f4ed] lg:h-[clamp(140px,13vw,240px)]">
+          <iframe
+            src={`${basePath}/framework/`}
+            title=""
+            tabIndex={-1}
+            loading="lazy"
+            aria-hidden="true"
+            className="pointer-events-none absolute top-0 left-0 h-[760px] w-[1240px] origin-top-left border-0 [transform:scale(0.36)] lg:[transform:scale(0.42)]"
+          />
         </span>
-        <span className="h-[6px] rounded-[3px] bg-[var(--tint-strong)] lg:max-[1279px]:hidden" />
-        <span className="h-[6px] w-[60%] rounded-[3px] bg-[var(--tint-strong)] lg:max-[1279px]:hidden" />
       </div>
     </div>
   );

@@ -27,14 +27,27 @@ const FAN = [
  * reference (Projects, Services and Testimonials two columns wide). All card content comes
  * from `site.ts` — nothing about anyone else is shown here.
  *
- * Layout by screen:
- *  - `fit:` (one-screen desktop, see globals.css): 4 columns × 2 equal rows that
- *    fill the remaining viewport height; card content is compact and clipped.
- *  - 3xl: 4 columns, equal-height rows, scrolling page.
- *  - md / xl: 2 columns. lg (1024–1279px) and phones: 1 column.
+ * Two deliberate layouts, and nothing in between:
+ *  - Two columns, from 768px all the way to the `fit` threshold. Projects,
+ *    Services and Testimonials span both, so they read as full-width bands
+ *    with About and AI Builds paired beside each other. Cards keep their full
+ *    content and the page scrolls.
+ *  - `fit:` (≥1360px wide and ≥600px tall, see globals.css): four columns over
+ *    two equal rows filling the viewport height, with compact card content.
+ *    3xl (1760px) keeps the equal-height rows when the page scrolls instead.
+ *  - Phones: one column.
+ *
+ * Why two columns rather than four below `fit`: four columns only works when
+ * the cards are also compacted, which is what `fit` does. Without it, four
+ * columns at 1100px leaves each card about 150px wide — the cramped in-between
+ * state this layout previously fell into, once at one column (1100–1279) and
+ * once at four narrow ones. Two columns is a complete layout at every size
+ * below the threshold. Note lg here is 1100px, not Tailwind's default; see
+ * --breakpoint-lg.
  */
 export function HomeBento() {
-  const wide = "md:col-span-2 lg:col-span-1 xl:col-span-2";
+  // Spans both columns in the two-column layout and two of four under `fit`.
+  const wide = "md:col-span-2";
 
   return (
     <Reveal delay={0.24} className="mt-6 block fit:mt-[clamp(12px,1.9vh,18px)] fit:min-h-0">
@@ -42,7 +55,7 @@ export function HomeBento() {
         aria-label="Overview"
         className="rounded-[2rem] border border-line [background:var(--glass-bg)] p-3 [box-shadow:var(--glass-shadow)] sm:p-4 md:p-5 fit:h-full fit:px-[clamp(14px,1.4vw,24px)] fit:py-[clamp(14px,2vh,24px)]"
       >
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 3xl:auto-rows-fr 3xl:grid-cols-4 fit:h-full fit:grid-cols-4 fit:grid-rows-2 fit:gap-[clamp(10px,1vw,16px)]">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-[clamp(10px,1vw,16px)] 3xl:auto-rows-fr 3xl:grid-cols-4 fit:h-full fit:grid-cols-4 fit:grid-rows-2">
           <BentoCard
             className={wide}
             icon="folder"
@@ -160,8 +173,8 @@ function BentoCard({
   children?: ReactNode;
 }) {
   const asideCols = wideAside
-    ? "sm:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] fit:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]"
-    : "sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2";
+    ? "sm:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]"
+    : "sm:grid-cols-2";
   const header = (
     <>
       {/* z-10 (a flex-item stacking context, no `position`) keeps the header

@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
-/* One-screen home layout (see Hero.tsx): only on desktops that are both wide
-   and tall enough for the whole bento to fit without scrolling. */
-@custom-variant fit (@media (min-width: 85rem) and (min-height: 37.5rem));
+/* One-screen home layout (see Hero.tsx): from the desktop breakpoint (1100px,
+   where the sidebar appears) on any window at least 600px tall. It used to
+   start at 1360px, which left common laptop and scaled external-monitor
+   viewports (1100-1359px CSS wide) in a scrolling in-between layout. Shorter
+   windows keep the two-column scrolling layout in HomeBento.tsx. */
+@custom-variant fit (@media (min-width: 68.75rem) and (min-height: 37.5rem));
 
 /* ==========================================================================
    Design tokens — Clay Brown #6B352A / Soft Butter #FFF1A6
