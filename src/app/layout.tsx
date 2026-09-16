@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Poppins } from "next/font/google";
 import { A11yWidget } from "@/components/A11yWidget";
 import { JsonLd } from "@/components/JsonLd";
@@ -166,6 +167,11 @@ export default function RootLayout({
           <FloatingThemeToggle />
           <A11yWidget />
         </CustomCursor>
+
+        {/* Vercel's pageview counter. It only reports to the Vercel dashboard;
+            it cannot be read back for an on-page visit counter. Renders nothing
+            and is inert on the static GitHub Pages copy. */}
+        <Analytics />
       </body>
     </html>
   );

@@ -6,6 +6,7 @@ import { nav, profilePhoto, site } from "@/lib/site";
 import { CustomCursorTarget } from "@/components/ui/custom-cursor";
 import { Icon, type IconName } from "./Icon";
 import { ThemeToggle } from "./ThemeToggle";
+import { VisitCount } from "./VisitCount";
 
 /**
  * Desktop sidebar (1100px and up). On phones and tablets it is not shown at
@@ -37,7 +38,9 @@ export function Sidebar() {
             <span className="sr-only">Verified</span>
           </span>
         </h2>
-        <p className="mt-[5px] text-[14.5px] tracking-[0.004em] text-ink-muted">{site.shortRole}</p>
+        <p className="mt-[5px] text-[14.5px] tracking-[0.004em] text-ink-muted">
+          <VisitCount />
+        </p>
 
         <ul className="mt-[18px] flex items-center justify-center gap-[10px]">
           {site.socials.map((social) => (

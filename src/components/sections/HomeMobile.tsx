@@ -2,6 +2,7 @@ import Link from "next/link";
 import { asset, homeFacts, profilePhoto, projectShots, site, testimonials } from "@/lib/site";
 import { Icon, type IconName } from "../Icon";
 import { ThemeToggle } from "../ThemeToggle";
+import { VisitCount } from "../VisitCount";
 
 /**
  * Home-page pieces that exist only on phones and tablets (below 1100px),
@@ -30,7 +31,7 @@ export function HomeProfile() {
             <span className="sr-only">Verified</span>
           </span>
         </span>
-        <span className="mt-[3px] truncate text-[12.5px] tracking-[0.004em] text-ink-muted">{site.shortRole}</span>
+        <VisitCount className="mt-[3px] truncate text-[12.5px] tracking-[0.004em] text-ink-muted" />
       </div>
       <ThemeToggle className="theme-btn-glass ml-auto grid h-[44px] w-[44px] shrink-0 place-items-center rounded-full border border-line text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_6px_16px_-10px_rgba(58,28,22,0.35)] transition-transform duration-300 active:scale-[0.92] active:duration-100" />
     </header>
