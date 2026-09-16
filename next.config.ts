@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  *
  *  - Vercel (the main host): a normal Next.js build, so the contact form's
  *    server route (src/app/api/contact/route.ts) runs there and can read the
- *    private CONTACT_WEBHOOK_URL. No base path.
+ *    private Gmail credentials. No base path.
  *  - GitHub Pages (.github/workflows/deploy.yml): STATIC_EXPORT=true gives
  *    `output: "export"`, plain HTML/CSS/JS in `out/`. Pages cannot run server
  *    code, so the workflow deletes src/app/api first; the form there shows its

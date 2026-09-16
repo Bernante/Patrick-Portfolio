@@ -193,7 +193,8 @@ FAQs, contact details and social links are there — components only read from i
    URLs, OG tags, sitemap and JSON-LD).
 2. Replace the placeholder email, phone and social URLs.
 3. Swap the `PB` initials avatar in `src/components/Sidebar.tsx` for a real photo.
-4. The contact form opens the visitor's mail client. To collect submissions
-   server-side, replace `handleSubmit` in `src/components/ContactForm.tsx` with a
-   POST to Formspree, Resend, or a GoHighLevel webhook.
+4. The contact form posts to `/api/contact/`, which emails the submission
+   through Gmail (see `src/app/api/contact/route.ts`). Set `GMAIL_USER` and
+   `GMAIL_APP_PASSWORD` in Vercel — see `.env.example`. This needs the Vercel
+   (server) build; the GitHub Pages copy has no API route.
 5. Replace the placeholder project results and stats with real numbers.

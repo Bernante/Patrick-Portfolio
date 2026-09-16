@@ -24,7 +24,7 @@ import { Reveal } from "../Reveal";
  *  - Below 1100px the form comes first and the FAQ card follows; under 560px
  *    the name fields and the contact row stack.
  *  - The form posts JSON to /api/contact/ (src/app/api/contact/route.ts), which
- *    forwards it privately (GoHighLevel webhook for now). The button shows
+ *    emails it to the owner through Gmail. The button shows
  *    "Sending…", then a thank-you line replaces the note, or an error line with
  *    the email address. A hidden honeypot field catches bots. On the GitHub
  *    Pages copy there is no API, so it always shows the email fallback.
