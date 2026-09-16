@@ -18,6 +18,8 @@ export const site = {
   firstName: "Patrick",
   role: "AI Automation Specialist, Web Developer & Video Editor",
   shortRole: "AI Automation · Web Dev · Video",
+  // Shown beside the visit count on the phone profile row.
+  profileRole: "AI automation specialist",
   tagline: "Create once. Run endlessly.",
   // One-line description under the home headline. Separate from `intro`, which
   // still feeds the SEO description and structured data.
@@ -215,7 +217,7 @@ export const services = [
 export const homeFacts = [
   // 5 = the service cards on the Services page (Services.tsx OFFERS), not the older `services` list below.
   { value: "5", label: "Services" },
-  { value: "GMT+8", label: "PH time" },
+  { value: "GMT+8", label: "US time" },
   { value: "1 day", label: "Reply time" },
 ] as const;
 

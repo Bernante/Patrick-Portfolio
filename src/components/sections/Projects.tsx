@@ -53,7 +53,6 @@ const AUTOMATIONS: Shot[] = [
     height: 877,
   },
   { title: "Coming soon", src: null },
-  { title: "Coming soon", src: null },
 ];
 
 type Category = "ghl" | "funnels" | "apps" | "ai";

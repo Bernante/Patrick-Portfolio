@@ -51,7 +51,12 @@ function loadCount(): Promise<number | null> {
   return pending;
 }
 
-export function VisitCount({ className = "" }: { className?: string }) {
+/**
+ * `separator`: prefix the count with " · " and, while it is loading or
+ * unavailable, render nothing at all — for the phone row, where text already
+ * sits to its left and holds the line's height.
+ */
+export function VisitCount({ className = "", separator = false }: { className?: string; separator?: boolean }) {
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -64,9 +69,13 @@ export function VisitCount({ className = "" }: { className?: string }) {
     };
   }, []);
 
+  const label = count === null ? "" : `${count.toLocaleString()} ${count === 1 ? "visit" : "visits"}`;
+
   return (
     <span className={className} aria-live="polite">
-      {count === null ? " " : `${count.toLocaleString()} ${count === 1 ? "visit" : "visits"}`}
+      {/* Standalone: a blank line of the same height, so nothing jumps when the
+          number lands. With a separator: nothing, the text beside it holds the line. */}
+      {count === null ? (separator ? "" : " ") : `${separator ? " · " : ""}${label}`}
     </span>
   );
 }

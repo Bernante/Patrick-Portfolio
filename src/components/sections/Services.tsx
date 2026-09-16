@@ -282,7 +282,7 @@ function LiveAutomation() {
     <div className="flex min-w-0 flex-col gap-[clamp(12px,1.6vh,18px)]">
       <header className="flex flex-col items-center gap-[12px] px-[4px] text-center">
         <div className="flex flex-col items-center gap-[6px]">
-          <p className={EYEBROW}>Live automation</p>
+          <p className={EYEBROW}>Automation</p>
           <h2 className="text-[length:clamp(20px,1.5vw,28px)] leading-[1.15] font-bold tracking-[-0.02em] text-ink">
             One form. The rest runs itself.
           </h2>

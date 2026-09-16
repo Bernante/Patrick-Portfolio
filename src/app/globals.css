@@ -602,8 +602,14 @@ html {
   scroll-behavior: auto !important;
 }
 
-/* Underline links: every link in the page content gets a line. */
-:root[data-a11y-links="true"] #main a {
+/* Underline links: every link gets a line, as the switch promises — the page
+   content, the sidebar nav and the phone tab bar alike. Several pages open
+   their cards with <button>, not <a>, so only real links change.
+   Skipped: the skip link, and icon-only links, which carry their label in an
+   `.sr-only` span — a line under a bare icon reads as a stray mark, not a link.
+   (Do not test this with `svg:only-child`: nav links hold their label in a bare
+   text node, so the icon counts as an only child and they would be missed.) */
+:root[data-a11y-links="true"] a:not(.skip-link):not(:has(> .sr-only)) {
   text-decoration-line: underline;
   text-underline-offset: 0.18em;
 }

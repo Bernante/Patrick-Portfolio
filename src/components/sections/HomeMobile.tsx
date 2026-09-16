@@ -31,7 +31,12 @@ export function HomeProfile() {
             <span className="sr-only">Verified</span>
           </span>
         </span>
-        <VisitCount className="mt-[3px] truncate text-[12.5px] tracking-[0.004em] text-ink-muted" />
+        {/* Below ~345px the role plus the count no longer fits beside the photo
+            and theme toggle, so the line steps down a little rather than truncate. */}
+        <span className="mt-[3px] truncate text-[12.5px] tracking-[0.004em] text-ink-muted max-[345px]:text-[10px]">
+          {site.profileRole}
+          <VisitCount separator />
+        </span>
       </div>
       <ThemeToggle className="theme-btn-glass ml-auto grid h-[44px] w-[44px] shrink-0 place-items-center rounded-full border border-line text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_6px_16px_-10px_rgba(58,28,22,0.35)] transition-transform duration-300 active:scale-[0.92] active:duration-100" />
     </header>
@@ -62,13 +67,13 @@ type Tile = {
   icon?: IconName;
   variant?: "tint" | "accent";
   /** Icon in the orange rounded tile used on the Services page method cards. */
-  orangeTile?: boolean;
 };
 
 const TILES: Tile[] = [
   { n: "01", label: "Projects", href: "/projects", title: "Real apps, funnels and GHL builds", desc: "Automations, funnels and sites I've built.", img: projectShots[0].src },
-  { n: "02", label: "Services", href: "/services", title: "What I build", desc: "Automation, CRM, funnels, websites and apps.", icon: "funnel", variant: "tint", orangeTile: true },
-  { n: "03", label: "About", href: "/about", title: `Hi, I’m ${site.firstName}.`, desc: "I build the systems that keep businesses running seamlessly behind the scenes.", img: asset("/about/about-illustration.webp") },
+  { n: "02", label: "Services", href: "/services", title: "What I build", desc: "Automation, CRM, funnels, websites and apps.", icon: "funnel", variant: "tint" },
+  // Portrait, not the illustration, like the reference's About tile.
+  { n: "03", label: "About", href: "/about", title: `Hi, I’m ${site.firstName}.`, desc: "I build the systems that keep businesses running seamlessly behind the scenes.", img: profilePhoto },
   { n: "04", label: "Testimonials", href: "/testimonials", title: "What clients say", desc: "Real words from real clients, coming soon.", icon: "chats", variant: "accent" },
   { n: "05", label: "Contact", href: "/contact", title: "FAQs / Contact", desc: "Quick answers, and how to reach me.", icon: "email" },
 ];
@@ -114,17 +119,15 @@ export function HomeExplore() {
               >
                 {tile.n} {tile.label}
               </span>
+              {/* A photo where there is one; otherwise the same orange badge on
+                  every icon tile, so Services, Testimonials and Contact match. */}
               {tile.img ? (
                 <img src={tile.img} alt="" loading="lazy" decoding="async" className="block h-[170px] w-full object-cover object-top" />
-              ) : tile.orangeTile ? (
-                <span className="grid h-[170px] place-items-center">
-                  <span className="grid h-[84px] w-[84px] place-items-center rounded-[24px] bg-[rgba(255,122,26,0.14)] text-[#ff7a1a] shadow-[inset_0_0_0_1px_rgba(255,122,26,0.28)]">
-                    <Icon name={tile.icon ?? "sparkle"} size={44} weight="regular" />
-                  </span>
-                </span>
               ) : (
-                <span className="grid h-[170px] place-items-center text-blueberry">
-                  <Icon name={tile.icon ?? "sparkle"} size={52} weight="duotone" />
+                <span className="grid h-[170px] place-items-center">
+                  <span className="grid h-[72px] w-[72px] place-items-center rounded-[20px] bg-[rgba(255,122,26,0.14)] text-[#ff7a1a] shadow-[inset_0_0_0_1px_rgba(255,122,26,0.28)]">
+                    <Icon name={tile.icon ?? "sparkle"} size={34} weight="regular" />
+                  </span>
                 </span>
               )}
               <span className="flex flex-col gap-[4px] px-[16px] py-[14px]">
