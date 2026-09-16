@@ -357,27 +357,74 @@ function AppReel() {
  * `pointer-events-none` keeps every click on the card's own button, and the
  * iframe only loads once the card is near the viewport.
  */
+/**
+ * Width the framework page is laid out at inside the preview, and how much of
+ * it shows. 960px keeps its desktop layout while making its type larger
+ * relative to the frame than a wider layout would; 460px ends just under the
+ * credits line.
+ */
+const PREVIEW_W = 960;
+const PREVIEW_H = 460;
+
 function AiLoop() {
   const host = site.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const areaRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLSpanElement>(null);
+  const viewRef = useRef<HTMLSpanElement>(null);
+  const [scale, setScale] = useState(0.3);
+  const [viewH, setViewH] = useState<number | null>(null);
+
+  // The frame always takes the card's full width and the page is scaled to
+  // that width, so the preview stays as large and legible as the card allows
+  // and follows the window while it resizes. On desktop the card has a fixed
+  // height: there the frame keeps its width and simply shows less of the page
+  // from the bottom when the space under the card text is short.
+  useEffect(() => {
+    const area = areaRef.current;
+    const bar = barRef.current;
+    const view = viewRef.current;
+    if (!area || !bar || !view) return;
+    const desktop = window.matchMedia("(min-width: 1100px)");
+    const update = () => {
+      const s = view.clientWidth / PREVIEW_W;
+      const natural = PREVIEW_H * s;
+      setScale(s);
+      setViewH(desktop.matches ? Math.max(60, Math.min(natural, area.clientHeight - bar.offsetHeight - 2)) : natural);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(area);
+    observer.observe(view);
+    desktop.addEventListener("change", update);
+    return () => {
+      observer.disconnect();
+      desktop.removeEventListener("change", update);
+    };
+  }, []);
 
   return (
-    <div aria-hidden="true" className="mt-[clamp(8px,1.2vh,14px)] grid min-h-[130px] flex-1 place-items-center">
-      <div className="w-full max-w-[420px] overflow-hidden rounded-[12px] border border-line-strong bg-white shadow-[0_14px_30px_-22px_rgba(58,28,22,0.45)] transition-transform duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[3px] lg:max-w-[clamp(300px,27vw,540px)]">
-        <span className="flex items-center gap-[8px] border-b border-line bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[10px] py-[7px]">
+    <div ref={areaRef} aria-hidden="true" className="mt-[clamp(8px,1.2vh,14px)] flex min-h-[130px] flex-1 items-start lg:min-h-0">
+      <div className="w-full overflow-hidden rounded-[12px] border border-line-strong bg-white shadow-[0_14px_30px_-22px_rgba(58,28,22,0.45)] transition-transform duration-[340ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:-translate-y-[3px]">
+        <span ref={barRef} className="flex items-center gap-[clamp(6px,0.6vw,10px)] border-b border-line bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[clamp(8px,0.8vw,12px)] py-[clamp(5px,0.5vw,8px)]">
           <WindowDots size={7} />
-          <span className="min-w-0 flex-1 truncate rounded-full bg-[rgba(255,255,255,0.75)] px-[8px] py-[3px] text-[9px] leading-[1.4] text-[#5e4036] lg:text-[length:clamp(9px,0.6vw,11px)]">
+          <span className="min-w-0 flex-1 truncate rounded-full bg-[rgba(255,255,255,0.75)] px-[8px] py-[3px] text-[length:clamp(10px,0.75vw,12px)] leading-[1.4] text-[#5e4036]">
             <span className="font-semibold text-[#3a1c16]">{host}</span>
             <span className="opacity-70">/framework/</span>
           </span>
         </span>
-        <span className="relative block h-[150px] overflow-hidden bg-[#f4f4ed] lg:h-[clamp(140px,13vw,240px)]">
+        <span
+          ref={viewRef}
+          className="relative block aspect-[960/460] w-full overflow-hidden bg-[#f4f4ed]"
+          style={viewH ? { height: viewH, aspectRatio: "auto" } : undefined}
+        >
           <iframe
             src={`${basePath}/framework/`}
             title=""
             tabIndex={-1}
             loading="lazy"
             aria-hidden="true"
-            className="pointer-events-none absolute top-0 left-0 h-[760px] w-[1240px] origin-top-left border-0 [transform:scale(0.36)] lg:[transform:scale(0.42)]"
+            className="pointer-events-none absolute top-0 left-0 origin-top-left border-0"
+            style={{ width: PREVIEW_W, height: PREVIEW_H, transform: `scale(${scale})` }}
           />
         </span>
       </div>
