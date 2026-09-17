@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { basePath } from "@/lib/base-path";
 import { asset, site } from "@/lib/site";
+import { Carousel360, type GalleryItem } from "../ui/image-fan-carousel";
 import { Icon } from "../Icon";
 import { Reveal } from "../Reveal";
 
@@ -66,6 +67,22 @@ const APPS: Shot[] = [
   { title: "Coming soon", src: null },
 ];
 
+/**
+ * Funnels and sites carousel, shown in the pop-up that opens from the Funnels
+ * and sites card. No screenshots or links yet, so every card shows
+ * "Coming Soon" and is not clickable. To add a real one, give an entry an
+ * `image` (homepage screenshot in public/projects/, wrapped in asset()) and a
+ * `link` (its live URL); links must be unique.
+ */
+const FUNNELS: GalleryItem[] = [
+  { title: "Funnel or site 1" },
+  { title: "Funnel or site 2" },
+  { title: "Funnel or site 3" },
+  { title: "Funnel or site 4" },
+  { title: "Funnel or site 5" },
+  { title: "Funnel or site 6" },
+];
+
 type Category = "ghl" | "funnels" | "apps" | "ai";
 type Filter = "all" | Category;
 
@@ -93,6 +110,8 @@ export function Projects() {
   const [automationsOpen, setAutomationsOpen] = useState(false);
   const [frameworkOpen, setFrameworkOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
+  const [funnelsOpen, setFunnelsOpen] = useState(false);
+  const funnelsRef = useRef<HTMLButtonElement>(null);
   const openerRef = useRef<HTMLButtonElement>(null);
   const appsRef = useRef<HTMLButtonElement>(null);
   const frameworkRef = useRef<HTMLButtonElement>(null);
@@ -104,6 +123,10 @@ export function Projects() {
   const closeApps = useCallback(() => {
     setAppsOpen(false);
     appsRef.current?.focus();
+  }, []);
+  const closeFunnels = useCallback(() => {
+    setFunnelsOpen(false);
+    funnelsRef.current?.focus();
   }, []);
   const closeFramework = useCallback(() => {
     setFrameworkOpen(false);
@@ -195,7 +218,18 @@ export function Projects() {
             </li>
 
             {/* ---- 2. Funnels and sites: top right ---- */}
-            <li className={`${CARD} col-span-2 flex flex-col sm:col-span-1 lg:col-span-5 ${phoneHidden("funnels")}`}>
+            <li
+              className={`${CARD} col-span-2 flex flex-col [transition:transform_.35s_cubic-bezier(0.22,1,0.36,1),box-shadow_.35s,border-color_.35s,scale_.34s_cubic-bezier(0.2,0.8,0.2,1)] active:scale-[0.97] sm:col-span-1 lg:col-span-5 ${phoneHidden("funnels")}`}
+            >
+              {/* The card keeps its fanned pages; pressing it opens the carousel. */}
+              <button
+                ref={funnelsRef}
+                type="button"
+                aria-haspopup="dialog"
+                aria-label="Open Funnels and sites"
+                onClick={() => setFunnelsOpen(true)}
+                className="absolute inset-0 z-[1] cursor-pointer rounded-[22px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blueberry"
+              />
               <CardHead logos={[GHL_LOGO]} title="Funnels and sites" description="Complete funnel builds and websites." />
               <PageFan />
             </li>
@@ -247,6 +281,13 @@ export function Projects() {
 
       {automationsOpen && <ShotsModal label="Automations" shots={AUTOMATIONS} onClose={closeAutomations} />}
       {appsOpen && <ShotsModal label="Apps and extensions" shots={APPS} onClose={closeApps} />}
+      {funnelsOpen && (
+        <ProjectModal label="Funnels and sites" onClose={closeFunnels}>
+          <div className="w-full">
+            <Carousel360 items={FUNNELS} />
+          </div>
+        </ProjectModal>
+      )}
       {frameworkOpen && <FrameworkModal onClose={closeFramework} />}
     </section>
   );
@@ -377,6 +418,37 @@ function AppReel() {
   );
 }
 
+
+/**
+ * Funnels media: three blank 3:4 pages fanned like the reference (and the home
+ * About card) — rotate ±9° and slide 26px at rest; ±11° and 30px with a 2px
+ * lift on hover. On desktop the pages scale with the card height so the fan
+ * fills its space. Blank until real page screenshots are added.
+ */
+const FAN = [
+  "[transform:rotate(-9deg)_translateX(-26%)] group-hover:[transform:rotate(-11deg)_translateX(-30%)_translateY(-2px)] group-focus-within:[transform:rotate(-11deg)_translateX(-30%)_translateY(-2px)]",
+  "group-hover:[transform:translateY(-2px)] group-focus-within:[transform:translateY(-2px)]",
+  "[transform:rotate(9deg)_translateX(26%)] group-hover:[transform:rotate(11deg)_translateX(30%)_translateY(-2px)] group-focus-within:[transform:rotate(11deg)_translateX(30%)_translateY(-2px)]",
+] as const;
+
+function PageFan() {
+  return (
+    <div
+      aria-hidden="true"
+      // pointer-events-none: the pages stack above the card's own button (grid
+      // items honour z-index), so taps must pass through to open the pop-up.
+      className="pointer-events-none mt-[clamp(8px,1.2vh,14px)] grid min-h-[150px] flex-1 place-items-center lg:min-h-0 lg:py-[6px]"
+    >
+      {FAN.map((fan, i) => (
+        <span
+          key={i}
+          className={`col-start-1 row-start-1 aspect-[3/4] w-[96px] rounded-[12px] bg-[var(--plate)] shadow-[0_0_0_3px_var(--plate-ring),0_14px_30px_-14px_rgba(6,12,26,0.6)] transition-transform duration-[520ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:h-full lg:max-h-[190px] lg:w-auto ${fan}`}
+          style={{ zIndex: i + 1 }}
+        />
+      ))}
+    </div>
+  );
+}
 
 /**
  * Preview of the framework page inside a browser window, the media for the
@@ -526,20 +598,19 @@ function FrameworkModal({ onClose }: { onClose: () => void }) {
 }
 
 /**
- * Full-screen pop-up for the Automations and the Apps and extensions cards,
- * copied from the reference (.pmodal):
- *  - 82% dark backdrop fading in over 0.26s; the row rises 18px and grows from
- *    98.5% over 0.42s with a spring ease.
+ * Full-screen pop-up shell for the project cards, copied from the reference
+ * (.pmodal):
+ *  - 82% dark backdrop fading in over 0.26s; the content rises 18px and grows
+ *    from 98.5% over 0.42s with a spring ease.
  *  - A 42px glass close button, top right, that turns 90° on hover and takes
  *    focus on open. Escape also closes; clicking the backdrop does not.
- *  - One row of large window frames (light title bar, red/yellow/green dots,
- *    16:10 screenshot) sliding left non-stop, and not pausing on hover.
- *  - Reduced motion: the row stands still and can be scrolled sideways instead.
+ *  - Tab cycles through the controls inside the pop-up and never leaves it.
  * Rendered into <body> so no transformed parent can trap its fixed position.
- * Page scroll is locked while it is open, and Tab stays on the close button.
+ * Page scroll is locked while it is open.
  */
-function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; onClose: () => void }) {
+function ProjectModal({ label, onClose, children }: { label: string; onClose: () => void; children: React.ReactNode }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -548,9 +619,20 @@ function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; o
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
-      if (event.key === "Tab") {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = [...dialogRef.current.querySelectorAll<HTMLElement>("button, a[href], [tabindex='0']")].filter(
+        (el) => el.tabIndex >= 0,
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !dialogRef.current.contains(active))) {
         event.preventDefault();
-        closeRef.current?.focus();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !dialogRef.current.contains(active))) {
+        event.preventDefault();
+        first.focus();
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -563,6 +645,7 @@ function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; o
 
   return createPortal(
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={label}
@@ -579,38 +662,7 @@ function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; o
       </button>
 
       <div className="flex h-full min-h-0 w-full max-w-[1560px] min-w-0 items-center overflow-hidden animate-[pmodal-panel_.42s_cubic-bezier(0.2,0.8,0.2,1)_both]">
-        <div className="w-full overflow-hidden motion-reduce:overflow-x-auto">
-          <ul className="flex w-max animate-[drift-left_28s_linear_infinite] motion-reduce:animate-none">
-            {[...shots, ...shots].map((shot, i) => (
-              <li
-                key={i}
-                // The second copy only exists for the seamless loop.
-                aria-hidden={i >= shots.length || undefined}
-                className="w-[clamp(520px,46vw,820px)] shrink-0 pr-[clamp(20px,2vw,30px)] max-[720px]:w-[min(88vw,480px)]"
-              >
-                <figure className="overflow-hidden rounded-[16px] border border-[rgba(11,30,63,0.12)] bg-[#fff] shadow-[0_1px_0_rgba(11,30,63,0.03),0_18px_40px_-26px_rgba(11,30,63,0.34)]">
-                  <span aria-hidden="true" className="flex items-center gap-[6px] border-b border-[rgba(11,30,63,0.12)] bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[12px] py-[9px]">
-                    <WindowDots size={9} />
-                  </span>
-                  {shot.src ? (
-                    <img
-                      src={shot.src}
-                      alt={shot.title}
-                      width={shot.width}
-                      height={shot.height}
-                      decoding="async"
-                      className="block aspect-[16/10] w-full bg-[#f4f4ed] object-cover object-center"
-                    />
-                  ) : (
-                    <div className="grid aspect-[16/10] place-items-center bg-[#f4f4ed] text-[14px] font-semibold tracking-[0.02em] text-[#8a8f9c]">
-                      Coming soon
-                    </div>
-                  )}
-                </figure>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {children}
       </div>
     </div>,
     document.body,
@@ -618,30 +670,47 @@ function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; o
 }
 
 /**
- * Funnels media: three blank 3:4 pages fanned like the reference (and the home
- * About card) — rotate ±9° and slide 26px at rest; ±11° and 30px with a 2px
- * lift on hover. On desktop the pages scale with the card height so the fan
- * fills its space. Blank until real page screenshots are added.
+ * Pop-up for the Automations and the Apps and extensions cards: one row of
+ * large window frames (light title bar, red/yellow/green dots, 16:10
+ * screenshot or "Coming soon") sliding left non-stop, not pausing on hover.
+ * Reduced motion: the row stands still and can be scrolled sideways instead.
  */
-const FAN = [
-  "[transform:rotate(-9deg)_translateX(-26%)] group-hover:[transform:rotate(-11deg)_translateX(-30%)_translateY(-2px)] group-focus-within:[transform:rotate(-11deg)_translateX(-30%)_translateY(-2px)]",
-  "group-hover:[transform:translateY(-2px)] group-focus-within:[transform:translateY(-2px)]",
-  "[transform:rotate(9deg)_translateX(26%)] group-hover:[transform:rotate(11deg)_translateX(30%)_translateY(-2px)] group-focus-within:[transform:rotate(11deg)_translateX(30%)_translateY(-2px)]",
-] as const;
-
-function PageFan() {
+function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; onClose: () => void }) {
   return (
-    <div
-      aria-hidden="true"
-      className="mt-[clamp(8px,1.2vh,14px)] grid min-h-[150px] flex-1 place-items-center lg:min-h-0 lg:py-[6px]"
-    >
-      {FAN.map((fan, i) => (
-        <span
-          key={i}
-          className={`col-start-1 row-start-1 aspect-[3/4] w-[96px] rounded-[12px] bg-[var(--plate)] shadow-[0_0_0_3px_var(--plate-ring),0_14px_30px_-14px_rgba(6,12,26,0.6)] transition-transform duration-[520ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:h-full lg:max-h-[190px] lg:w-auto ${fan}`}
-          style={{ zIndex: i + 1 }}
-        />
-      ))}
+    <ProjectModal label={label} onClose={onClose}>
+    <div className="w-full overflow-hidden motion-reduce:overflow-x-auto">
+      <ul className="flex w-max animate-[drift-left_28s_linear_infinite] motion-reduce:animate-none">
+        {[...shots, ...shots].map((shot, i) => (
+          <li
+            key={i}
+            // The second copy only exists for the seamless loop.
+            aria-hidden={i >= shots.length || undefined}
+            className="w-[clamp(520px,46vw,820px)] shrink-0 pr-[clamp(20px,2vw,30px)] max-[720px]:w-[min(88vw,480px)]"
+          >
+            <figure className="overflow-hidden rounded-[16px] border border-[rgba(11,30,63,0.12)] bg-[#fff] shadow-[0_1px_0_rgba(11,30,63,0.03),0_18px_40px_-26px_rgba(11,30,63,0.34)]">
+              <span aria-hidden="true" className="flex items-center gap-[6px] border-b border-[rgba(11,30,63,0.12)] bg-[linear-gradient(#f4f4ed,#e9e9e0)] px-[12px] py-[9px]">
+                <WindowDots size={9} />
+              </span>
+              {shot.src ? (
+                <img
+                  src={shot.src}
+                  alt={shot.title}
+                  width={shot.width}
+                  height={shot.height}
+                  decoding="async"
+                  className="block aspect-[16/10] w-full bg-[#f4f4ed] object-cover object-center"
+                />
+              ) : (
+                <div className="grid aspect-[16/10] place-items-center bg-[#f4f4ed] text-[14px] font-semibold tracking-[0.02em] text-[#8a8f9c]">
+                  Coming soon
+                </div>
+              )}
+            </figure>
+          </li>
+        ))}
+      </ul>
     </div>
+    </ProjectModal>
   );
 }
+
