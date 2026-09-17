@@ -56,6 +56,16 @@ const AUTOMATIONS: Shot[] = [
   { title: "Coming soon", src: null },
 ];
 
+/**
+ * Apps and extensions pop-up: blank "Coming soon" windows until there are
+ * apps or extensions to show. Replace an entry the same way as AUTOMATIONS.
+ */
+const APPS: Shot[] = [
+  { title: "Coming soon", src: null },
+  { title: "Coming soon", src: null },
+  { title: "Coming soon", src: null },
+];
+
 type Category = "ghl" | "funnels" | "apps" | "ai";
 type Filter = "all" | Category;
 
@@ -82,12 +92,18 @@ export function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
   const [automationsOpen, setAutomationsOpen] = useState(false);
   const [frameworkOpen, setFrameworkOpen] = useState(false);
+  const [appsOpen, setAppsOpen] = useState(false);
   const openerRef = useRef<HTMLButtonElement>(null);
+  const appsRef = useRef<HTMLButtonElement>(null);
   const frameworkRef = useRef<HTMLButtonElement>(null);
   // Closing hands focus back to the card, like the reference.
   const closeAutomations = useCallback(() => {
     setAutomationsOpen(false);
     openerRef.current?.focus();
+  }, []);
+  const closeApps = useCallback(() => {
+    setAppsOpen(false);
+    appsRef.current?.focus();
   }, []);
   const closeFramework = useCallback(() => {
     setFrameworkOpen(false);
@@ -205,9 +221,18 @@ export function Projects() {
 
             {/* ---- 4. Apps and extensions: wide, bottom right ---- */}
             <li
-              className={`${CARD} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] lg:col-span-7 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-x-[clamp(12px,1.2vw,20px)] ${phoneHidden("apps")}`}
+              className={`${CARD} col-span-2 flex flex-col gap-[clamp(8px,1.2vh,14px)] [transition:transform_.35s_cubic-bezier(0.22,1,0.36,1),box-shadow_.35s,border-color_.35s,scale_.34s_cubic-bezier(0.2,0.8,0.2,1)] active:scale-[0.97] lg:col-span-7 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-x-[clamp(12px,1.2vw,20px)] ${phoneHidden("apps")}`}
             >
-              <div className="flex min-w-0 flex-col">
+              {/* Opens the same pop-up as Automations, with Coming soon windows. */}
+              <button
+                ref={appsRef}
+                type="button"
+                aria-haspopup="dialog"
+                aria-label="Open Apps and extensions"
+                onClick={() => setAppsOpen(true)}
+                className="absolute inset-0 z-[1] cursor-pointer rounded-[22px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blueberry"
+              />
+              <div className="relative flex min-w-0 flex-col">
                 <CardHead
                   logos={[PLAY_LOGO, EXPO_LOGO, CHROME_LOGO]}
                   title="Apps and extensions"
@@ -220,7 +245,8 @@ export function Projects() {
         </div>
       </Reveal>
 
-      {automationsOpen && <AutomationsModal onClose={closeAutomations} />}
+      {automationsOpen && <ShotsModal label="Automations" shots={AUTOMATIONS} onClose={closeAutomations} />}
+      {appsOpen && <ShotsModal label="Apps and extensions" shots={APPS} onClose={closeApps} />}
       {frameworkOpen && <FrameworkModal onClose={closeFramework} />}
     </section>
   );
@@ -321,7 +347,8 @@ function ScreenReel() {
 /**
  * Apps media: empty window frames drifting sideways (reference:
  * bento__reel--row, 28s per loop) with an 8% side fade. No photos until the
- * owner has apps or extensions to show. Paused until hover or focus.
+ * owner has apps or extensions to show, so each says Coming soon. Paused until
+ * hover or focus.
  */
 const APP_FRAMES = 8;
 
@@ -339,7 +366,9 @@ function AppReel() {
               <span className="absolute top-[7px] left-[9px] flex gap-[4px]">
                 <WindowDots size={6} />
               </span>
-              <div className="aspect-[16/10] rounded-[7px] bg-cream-soft" />
+              <div className="grid aspect-[16/10] place-items-center rounded-[7px] bg-cream-soft text-[12px] font-semibold tracking-[0.02em] text-ink-muted lg:text-[length:clamp(11px,0.8vw,14px)]">
+                Coming soon
+              </div>
             </div>
           </div>
         ))}
@@ -497,7 +526,8 @@ function FrameworkModal({ onClose }: { onClose: () => void }) {
 }
 
 /**
- * Full-screen Automations pop-up, copied from the reference (.pmodal):
+ * Full-screen pop-up for the Automations and the Apps and extensions cards,
+ * copied from the reference (.pmodal):
  *  - 82% dark backdrop fading in over 0.26s; the row rises 18px and grows from
  *    98.5% over 0.42s with a spring ease.
  *  - A 42px glass close button, top right, that turns 90° on hover and takes
@@ -508,7 +538,7 @@ function FrameworkModal({ onClose }: { onClose: () => void }) {
  * Rendered into <body> so no transformed parent can trap its fixed position.
  * Page scroll is locked while it is open, and Tab stays on the close button.
  */
-function AutomationsModal({ onClose }: { onClose: () => void }) {
+function ShotsModal({ label, shots, onClose }: { label: string; shots: Shot[]; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -535,7 +565,7 @@ function AutomationsModal({ onClose }: { onClose: () => void }) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Automations"
+      aria-label={label}
       className="no-print fixed inset-0 z-[8000] grid grid-cols-[minmax(0,1fr)] place-items-center bg-[rgba(20,10,8,0.82)] px-[clamp(12px,2.4vw,40px)] pt-[clamp(56px,8vh,72px)] pb-[clamp(14px,3vh,32px)] animate-[pmodal-in_.26s_cubic-bezier(0.25,0.1,0.25,1)_both]"
     >
       <button
@@ -551,11 +581,11 @@ function AutomationsModal({ onClose }: { onClose: () => void }) {
       <div className="flex h-full min-h-0 w-full max-w-[1560px] min-w-0 items-center overflow-hidden animate-[pmodal-panel_.42s_cubic-bezier(0.2,0.8,0.2,1)_both]">
         <div className="w-full overflow-hidden motion-reduce:overflow-x-auto">
           <ul className="flex w-max animate-[drift-left_28s_linear_infinite] motion-reduce:animate-none">
-            {[...AUTOMATIONS, ...AUTOMATIONS].map((shot, i) => (
+            {[...shots, ...shots].map((shot, i) => (
               <li
                 key={i}
                 // The second copy only exists for the seamless loop.
-                aria-hidden={i >= AUTOMATIONS.length || undefined}
+                aria-hidden={i >= shots.length || undefined}
                 className="w-[clamp(520px,46vw,820px)] shrink-0 pr-[clamp(20px,2vw,30px)] max-[720px]:w-[min(88vw,480px)]"
               >
                 <figure className="overflow-hidden rounded-[16px] border border-[rgba(11,30,63,0.12)] bg-[#fff] shadow-[0_1px_0_rgba(11,30,63,0.03),0_18px_40px_-26px_rgba(11,30,63,0.34)]">
